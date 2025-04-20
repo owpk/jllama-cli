@@ -1,0 +1,6 @@
+applicationType: cli
+defaultPackage: org.owpk
+testFramework: junit
+sourceLanguage: java
+buildTool: gradle
+features: [app-name, graalvm, gradle, http-client-test, jackson-databind, java, junit, logback, lombok, micronaut-build, picocli, picocli-java-application, picocli-junit, reactor-http-client, readme, shade, yaml, yaml-build]

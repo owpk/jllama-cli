@@ -1,0 +1,44 @@
+plugins {
+    id("io.micronaut.application") version "4.5.0"
+    id("com.gradleup.shadow") version "8.3.6"
+}
+
+version = "0.1"
+group = "org.owpk"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("info.picocli:picocli-codegen")
+    implementation("info.picocli:picocli")
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut.picocli:micronaut-picocli")
+    implementation("io.micronaut.reactor:micronaut-reactor-http-client")
+    compileOnly("org.projectlombok:lombok")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly("org.yaml:snakeyaml")
+}
+
+application {
+    mainClass = "org.owpk.OllamaCliCommand"
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("21")
+    targetCompatibility = JavaVersion.toVersion("21")
+}
+
+micronaut {
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("org.owpk.*")
+    }
+}
+
+tasks.named("dockerfileNative") {
+    jdkVersion = "21"
+}
