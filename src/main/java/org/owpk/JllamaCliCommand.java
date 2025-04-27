@@ -4,11 +4,7 @@ import io.micronaut.configuration.picocli.PicocliRunner;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(
-    name = "ollama-cli",
-    description = "...",
-    mixinStandardHelpOptions = true
-)
+@Command(name = "ollama-cli", description = "...", mixinStandardHelpOptions = true)
 public class JllamaCliCommand implements Runnable {
 
     @Option(names = { "-v", "--verbose" }, description = "...")
@@ -22,6 +18,9 @@ public class JllamaCliCommand implements Runnable {
         // business logic here
         if (verbose) {
             System.out.println("Hi!");
+        } else {
+            System.out.println("Hello!");
         }
+
     }
 }

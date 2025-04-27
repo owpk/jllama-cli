@@ -1,0 +1,36 @@
+package org.owpk.llm.ollama.client.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.micronaut.core.annotation.Introspected;
+import lombok.Data;
+
+@Data
+@Introspected
+public class OllamaChatMessage {
+    /**
+     * The role of the message, either system, user, assistant, or tool
+     */
+    @JsonProperty("role")
+    private String role;
+
+    /**
+     * The content of the message
+     */
+    @JsonProperty("content")
+    private String content;
+
+    /**
+     * (optional): a list of images to include in the message (for multimodal models
+     * such as llava)
+     */
+    @JsonProperty("images")
+    private String[] images;
+
+    /**
+     * (optional): a list of tools in JSON that the model wants to use
+     */
+    @JsonProperty("tool_calls")
+    private String[] toolCalls;
+
+}
