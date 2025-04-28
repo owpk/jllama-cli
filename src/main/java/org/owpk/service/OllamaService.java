@@ -1,5 +1,5 @@
 package org.owpk.service;
 
-public class OpenAiService {
+public class OllamaService {
 
 }

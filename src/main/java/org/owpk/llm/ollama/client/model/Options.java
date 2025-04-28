@@ -1,12 +1,14 @@
 package org.owpk.llm.ollama.client.model;
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Introspected
 @Builder
+@Serdeable
 public class Options {
     /**
      * Enable Mirostat sampling for controlling perplexity. (default: 0, 0 =
@@ -60,7 +62,7 @@ public class Options {
      * answer more creatively. (Default: 0.8)
      */
     @Builder.Default
-    private float temperature = 0.7f;
+    private float temperature = 0.8f;
 
     /**
      * Sets the random number seed to use for generation. Setting this to a specific

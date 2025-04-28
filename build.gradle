@@ -1,5 +1,5 @@
 plugins {
-    id("io.micronaut.application") version "4.5.0"
+    id("io.micronaut.application") version "4.5.3"
     id("com.gradleup.shadow") version "8.3.6"
 }
 
@@ -14,18 +14,27 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'info.picocli:picocli-codegen'
     implementation 'info.picocli:picocli'
-    implementation 'io.micronaut:micronaut-jackson-databind'
     implementation 'io.micronaut.picocli:micronaut-picocli'
     implementation 'io.micronaut.reactor:micronaut-reactor-http-client'
+    implementation 'io.micronaut:micronaut-jackson-databind'
     implementation 'io.micronaut.serde:micronaut-serde-jackson'
-    implementation 'io.vavr:vavr:0.10.6'
+    // implementation 'io.vavr:vavr:0.10.6'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'ch.qos.logback:logback-classic'
     runtimeOnly 'org.yaml:snakeyaml'
 }
 
 application {
-    mainClass = "org.owpk.OllamaCliCommand"
+    mainClass = "org.owpk.JllamaCliCommand"
+}
+
+graalvmNative {
+    binaries {
+        main {
+            imageName.set('ollamacli') 
+            // buildArgs.add('-Ob') 
+        }
+    }
 }
 
 java {

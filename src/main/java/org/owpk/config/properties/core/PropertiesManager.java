@@ -5,27 +5,24 @@ import java.util.WeakHashMap;
 
 import org.owpk.config.properties.PropertiesProvider;
 import org.owpk.config.properties.validator.PropertyValidationException;
+import org.owpk.llm.ollama.client.OllamaProps;
 
 public class PropertiesManager {
-    private static final PropertiesManager INSTANCE = new PropertiesManager();
-
     private final Map<Class<?>, PropertiesProvider> providers = new WeakHashMap<>();
 
-    public static PropertiesManager getInstance() {
-        return INSTANCE;
-    }
-
-    private PropertiesManager() {
+    public PropertiesManager() {
         registerProviders();
+        validateProviders();
     }
 
     private void registerProviders() {
         var mainProps = createMainProps();
         createCredentialPropertiesProvider(mainProps);
+        createOllamaProps(mainProps);
     }
 
-    public static void validateProviders() throws PropertyValidationException {
-        for (var provider : INSTANCE.providers.values()) {
+    private void validateProviders() throws PropertyValidationException {
+        for (var provider : providers.values()) {
             provider.bootstrapValidation();
         }
     }
@@ -41,6 +38,11 @@ public class PropertiesManager {
     private PropertiesProvider createCredentialPropertiesProvider(AppBaseProps mainProps) {
         var storage = mainProps.getStorage();
         return registerProvider(new ApiKeyProps(storage));
+    }
+
+    private PropertiesProvider createOllamaProps(AppBaseProps mainProps) {
+        var storage = mainProps.getStorage();
+        return registerProvider(new OllamaProps(storage));
     }
 
     private PropertiesProvider registerProvider(PropertiesProvider provider) {

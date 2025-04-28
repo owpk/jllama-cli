@@ -1,13 +1,18 @@
 package org.owpk.llm.ollama.client.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.micronaut.core.annotation.Introspected;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Introspected
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaChatMessage {
+
     /**
      * The role of the message, either system, user, assistant, or tool
      */

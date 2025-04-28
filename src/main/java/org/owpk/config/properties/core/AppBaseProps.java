@@ -8,11 +8,13 @@ import org.owpk.storage.RootedStorage;
 import org.owpk.storage.Storage;
 import org.owpk.storage.impl.LocalFileStorage;
 
+import jakarta.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
+@Singleton
 public class AppBaseProps extends AbsPropertiesProvider {
     public static final PropertyDef DEF_GIGACHAT_CLI_HOME = new PropertyDef("ollama_cli_home",
             System.getProperty("user.home") + "/.ollama-cli/");
@@ -48,9 +50,7 @@ public class AppBaseProps extends AbsPropertiesProvider {
                 DEF_CHATS_HISTORY_MODE,
                 DEF_CHATS_HISTORY_HOME,
                 DEF_CURRENT_CHAT_NAME,
-
                 DEF_ROLES_YML,
-
                 DEF_CURRENT_MODEL,
                 DEF_GIGACHAT_CLI_HOME);
     }

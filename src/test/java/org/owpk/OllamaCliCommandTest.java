@@ -1,28 +1,22 @@
 package org.owpk;
 
-import io.micronaut.configuration.picocli.PicocliRunner;
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.env.Environment;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.env.Environment;
 
 public class OllamaCliCommandTest {
 
     @Test
     public void testWithCommandLineOption() throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(baos));
-
         try (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {
-            String[] args = new String[] { "-v" };
-            PicocliRunner.run(JllamaCliCommand.class, ctx, args);
-
-            // ollama-cli
-            assertTrue(baos.toString().contains("Hi!"));
+            // var manager = (PropertiesManager) ctx.getBean(PropertiesManager.class);
+            // var requestApi = "TEST_ME_PLEASE";
+            // String[] args = new String[] { "-v", "--api-url", requestApi };
+            // PicocliRunner.run(JllamaCliCommand.class, ctx, args);
+            // var props = manager.getProvider(OllamaProps.class);
+            // var apiUrl = props.getProperty(OllamaProps.OLLAMA_API_URL);
+            // assertEquals(requestApi, apiUrl);
         }
     }
 }

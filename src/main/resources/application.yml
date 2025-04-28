@@ -1,11 +1,14 @@
 micronaut:
   application:
-    name: jllama-cli
+    name: ollama-cli
+  codec:
+    json:
+      additional-types:
+        - application/x-ndjson
   http:
     client:
-      read-timeout: 10s
-      connect-timeout: 5s
-
+      read-timeout: 30s
+  
 ollama:
-  api:
-    url: ${JLLAMA_OLLAMA_HOST:http://localhost:11434}
+  props:
+    api-url: ${ollama.api.url:`http://localhost:11434`}

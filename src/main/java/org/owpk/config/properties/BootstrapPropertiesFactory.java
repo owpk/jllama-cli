@@ -6,7 +6,6 @@ import java.util.WeakHashMap;
 import org.owpk.config.properties.core.ApiKeyProps;
 import org.owpk.config.properties.core.AppBaseProps;
 import org.owpk.config.properties.validator.PropertyValidationException;
-import org.owpk.storage.Storage;
 
 public class BootstrapPropertiesFactory {
     private static final BootstrapPropertiesFactory INSTANCE = new BootstrapPropertiesFactory();
@@ -34,10 +33,6 @@ public class BootstrapPropertiesFactory {
 
     public AbsPropertiesProvider getProvider(Class<?> providerClass) {
         return providers.get(providerClass);
-    }
-
-    private AppBaseProps creatMainPropsProvider(String name, Storage storage) {
-        return (AppBaseProps) registerProvider(new AppBaseProps(name, storage));
     }
 
     private AppBaseProps createDefaultMainPropertiesProvider() {

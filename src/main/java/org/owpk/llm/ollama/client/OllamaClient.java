@@ -8,12 +8,15 @@ import org.owpk.llm.ollama.client.model.OllamaGenerateRequest;
 import org.owpk.llm.ollama.client.model.OllamaGenerateResponse;
 
 import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.client.annotation.Client;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
  * Интерфейс для работы с Ollama REST API
  */
+@Client("${ollama.props.api-url}")
 public interface OllamaClient {
 
 	/**
@@ -22,6 +25,7 @@ public interface OllamaClient {
 	 * @param request запрос на генерацию текста
 	 * @return Flux с потоком ответов генерации
 	 */
+	@Post("/api/generate")
 	Flux<OllamaGenerateResponse> generate(@Body OllamaGenerateRequest request);
 
 	/**
@@ -30,6 +34,7 @@ public interface OllamaClient {
 	 * @param request запрос на чат-взаимодействие
 	 * @return Flux с потоком ответов
 	 */
+	@Post("/api/chat")
 	Flux<OllamaChatResponse> chat(@Body OllamaChatRequest request);
 
 	/**
@@ -38,5 +43,6 @@ public interface OllamaClient {
 	 * @param request запрос на создание эмбеддинга
 	 * @return Mono с ответом, содержащим вектор эмбеддинга
 	 */
+	@Post("/api/embedding")
 	Mono<OllamaEmbeddingResponse> createEmbedding(@Body OllamaEmbeddingRequest request);
 }
