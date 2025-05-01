@@ -1,9 +1,13 @@
 package org.owpk.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.owpk.llm.provider.LlmProvider;
 import org.owpk.llm.provider.model.ChatRequest;
 import org.owpk.llm.provider.model.MessageType;
 import org.owpk.service.dialog.DialogRepository;
+import org.owpk.service.dialog.Message;
 import org.owpk.service.role.RolesManager;
 
 import lombok.Data;
@@ -27,13 +31,14 @@ public class LlmService {
 	public Flux<String> generate(String prompt, String roleId) {
 		var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
 		var messageBuffer = new StringBuilder();
-		return llmProvider.generate(prompt, rolePrompt)
-				.doOnNext(responses -> {
-					// Сохраняем ответ в буфер
-					messageBuffer.append(responses);
-				}).doOnComplete(() -> {
-					System.out.println("Init saving message: " + messageBuffer.toString().length());
-				});
+
+		return dialogRepository.createDialog()
+				.flatMapMany(dialogId -> llmProvider.generate(prompt, rolePrompt)
+						.doOnNext(responses -> messageBuffer.append(responses))
+						.doOnComplete(() -> dialogRepository.saveMessages(dialogId,
+								List.of(createMessage(prompt, MessageType.USER),
+										createMessage(messageBuffer.toString(), MessageType.ASSISTANT)))
+								.subscribe()));
 	}
 
 	/**
@@ -49,4 +54,13 @@ public class LlmService {
 
 		throw new UnsupportedOperationException("Unimplemented method 'chat'");
 	}
+
+	private Message createMessage(String content, MessageType type) {
+		return Message.builder()
+				.content(content)
+				.type(type)
+				.timestamp(LocalDateTime.now())
+				.build();
+	}
+
 }

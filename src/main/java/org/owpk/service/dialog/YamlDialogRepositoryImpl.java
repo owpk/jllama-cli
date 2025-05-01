@@ -5,19 +5,20 @@ import java.util.UUID;
 
 import org.owpk.config.properties.model.ApplicationProperties;
 import org.owpk.storage.Storage;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.owpk.utils.serializers.SerializingException;
+import org.owpk.utils.serializers.YamlObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class DialogRepositoryImpl implements DialogRepository {
+public class YamlDialogRepositoryImpl implements DialogRepository {
+	private static final String EXT = ".yaml";
+
 	private final Storage storage;
 	private final ApplicationProperties properties;
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final YamlObjectMapper serializer;
 
 	@Override
 	public Mono<String> createDialog() {
@@ -31,10 +32,12 @@ public class DialogRepositoryImpl implements DialogRepository {
 	public Mono<Void> saveMessages(String dialogId, List<Message> messages) {
 		return Mono.fromCallable(() -> {
 			try {
-				String json = objectMapper.writeValueAsString(messages);
-				storage.saveContent(properties.getChatsPath() + "/" + dialogId + ".json", json.getBytes(), true);
+				byte[] data = serializer.dump(messages);
+				var dialogFile = storage.createFileOrDirIfNotExists(false, properties.getChatsPath(),
+						dialogId + EXT);
+				storage.saveContent(dialogFile, data, true);
 				return null;
-			} catch (JsonProcessingException e) {
+			} catch (SerializingException e) {
 				throw new RuntimeException("Failed to save messages for dialog " + dialogId, e);
 			}
 		});
@@ -43,16 +46,15 @@ public class DialogRepositoryImpl implements DialogRepository {
 	@Override
 	public Flux<Message> getMessages(String dialogId) {
 		return Mono.fromCallable(() -> {
-			if (!storage.exists(properties.getChatsPath() + "/" + dialogId + ".json")) {
+			if (!storage.exists(properties.getChatsPath(), dialogId + EXT))
 				return List.<Message>of();
-			}
-			byte[] content = storage.getContent(properties.getChatsPath() + "/" + dialogId + ".json");
+
+			byte[] content = storage.getContent(properties.getChatsPath(), dialogId + EXT);
 			try {
-				return objectMapper.readValue(new String(content),
-						objectMapper.getTypeFactory().constructCollectionType(List.class, Message.class));
-			} catch (JsonProcessingException e) {
+				return serializer.convert(content, ChatDialog.class).getMessages();
+			} catch (SerializingException e) {
 				throw new RuntimeException("Failed to read messages for dialog " + dialogId, e);
 			}
-		}).flatMapMany(Flux::fromIterable);
+		}).flatMapMany(it -> Flux.fromIterable(it));
 	}
 }

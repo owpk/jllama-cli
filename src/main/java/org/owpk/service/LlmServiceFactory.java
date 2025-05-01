@@ -22,10 +22,8 @@ public class LlmServiceFactory {
 
 	public LlmService createLlmService(LlmSupports.KnownLlm llm) {
 		var properties = propertiesManager.getLlmProviderProperties(llm);
-		return new LlmService(
-				createProvider(llm, properties),
-				dialogRepository,
-				rolesManager);
+		return new LlmService(createProvider(llm, properties),
+				dialogRepository, rolesManager);
 	}
 
 	private LlmProvider<?> createProvider(LlmSupports.KnownLlm llm, LlmProviderProperties properties) {

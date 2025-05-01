@@ -79,4 +79,19 @@ public class LocalFileStorage implements Storage {
         return this.createFileOrDirIfNotExists(isDir, Path.of(path, more).toString());
     }
 
+    @Override
+    public boolean exists(String path, String... more) {
+        return Files.exists(Path.of(path, more));
+    }
+
+    @Override
+    public List<Content> getContents(String path, String... more) throws StorageException {
+        return getContents(Path.of(path, more).toString());
+    }
+
+    @Override
+    public byte[] getContent(String path, String... more) throws StorageException {
+        return getContent(Path.of(path, more).toString());
+    }
+
 }

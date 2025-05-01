@@ -14,7 +14,6 @@ public class Message {
 	private String id;
 	private String content;
 	private MessageType type;
-	private String dialogId;
 	private LocalDateTime timestamp;
 	private Map<String, Object> metadata;
 }

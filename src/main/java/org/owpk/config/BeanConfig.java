@@ -5,8 +5,7 @@ import java.util.Optional;
 import org.owpk.config.properties.AppPropertiesConstants;
 import org.owpk.config.properties.PropertiesManager;
 import org.owpk.service.LlmServiceFactory;
-import org.owpk.service.dialog.DialogRepository;
-import org.owpk.service.dialog.DialogRepositoryImpl;
+import org.owpk.service.dialog.YamlDialogRepositoryImpl;
 import org.owpk.service.role.RolesManager;
 import org.owpk.utils.serializers.YamlObjectMapper;
 
@@ -31,7 +30,8 @@ public class BeanConfig {
 	}
 
 	@Bean
-	public DialogRepository dialogRepository(PropertiesManager propertiesManager) {
+	public YamlDialogRepositoryImpl dialogRepository(YamlObjectMapper yamlObjectMapper,
+			PropertiesManager propertiesManager) {
 		var applicationProperties = propertiesManager.getApplicationProperties();
 		var chatsPath = Optional.ofNullable(applicationProperties.getChatsPath()).orElse("");
 
@@ -44,13 +44,13 @@ public class BeanConfig {
 			applicationProperties.setChatsPath(chatsPath);
 		}
 
-		return new DialogRepositoryImpl(storage, applicationProperties);
+		return new YamlDialogRepositoryImpl(storage, applicationProperties, yamlObjectMapper);
 	}
 
 	@Bean
 	public LlmServiceFactory llmServiceFactory(@Client StreamingHttpClient httpClient,
 			PropertiesManager propertiesManager,
-			DialogRepository dialogRepository, RolesManager rolesManager) {
+			YamlDialogRepositoryImpl dialogRepository, RolesManager rolesManager) {
 		return new LlmServiceFactory(httpClient, propertiesManager, dialogRepository, rolesManager);
 	}
 }
