@@ -1,12 +1,14 @@
 package org.owpk.llm.client.ollama.client.model;
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Introspected
+@ReflectiveAccess
 @Builder
 @Serdeable
 public class Options {

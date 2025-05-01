@@ -7,7 +7,8 @@ import org.owpk.config.properties.PropertiesManager;
 import org.owpk.service.LlmServiceFactory;
 import org.owpk.service.dialog.YamlDialogRepositoryImpl;
 import org.owpk.service.role.RolesManager;
-import org.owpk.utils.serializers.YamlObjectMapper;
+import org.owpk.utils.serializers.ComplexSerializer;
+import org.owpk.utils.serializers.YamlObjectSerializer;
 
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
@@ -20,17 +21,17 @@ import lombok.extern.slf4j.Slf4j;
 public class BeanConfig {
 
 	@Bean
-	public YamlObjectMapper yamlObjectMapper() {
-		return new YamlObjectMapper();
+	public ComplexSerializer yamlObjectMapper() {
+		return new YamlObjectSerializer();
 	}
 
 	@Bean
-	public RolesManager rolesManager(YamlObjectMapper yamlObjectMapper, PropertiesManager manager) {
-		return new RolesManager(yamlObjectMapper, manager.getApplicationProperties());
+	public RolesManager rolesManager(PropertiesManager manager) {
+		return new RolesManager(yamlObjectMapper(), manager.getApplicationProperties());
 	}
 
 	@Bean
-	public YamlDialogRepositoryImpl dialogRepository(YamlObjectMapper yamlObjectMapper,
+	public YamlDialogRepositoryImpl dialogRepository(ComplexSerializer complexSerializer,
 			PropertiesManager propertiesManager) {
 		var applicationProperties = propertiesManager.getApplicationProperties();
 		var chatsPath = Optional.ofNullable(applicationProperties.getChatsPath()).orElse("");
@@ -42,9 +43,10 @@ public class BeanConfig {
 			chatsPath = storage.createFileOrDirIfNotExists(true, propertiesManager.getAppHomeDir(),
 					AppPropertiesConstants.APP_CHATS_DIR_NAME);
 			applicationProperties.setChatsPath(chatsPath);
+			propertiesManager.getApplicationPropertiesProvider().onPropertiesChanged(applicationProperties);
 		}
 
-		return new YamlDialogRepositoryImpl(storage, applicationProperties, yamlObjectMapper);
+		return new YamlDialogRepositoryImpl(storage, propertiesManager, complexSerializer);
 	}
 
 	@Bean

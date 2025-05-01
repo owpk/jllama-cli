@@ -9,10 +9,9 @@ import org.owpk.config.properties.model.ApplicationProperties;
 import org.owpk.config.properties.model.LlmProviderProperties;
 import org.owpk.config.properties.provider.PropertiesProccessingException;
 import org.owpk.config.properties.provider.RemoteObjectPropsProvider;
-import org.owpk.config.properties.provider.domain.ApplicationMainPropertiesProvider;
 import org.owpk.storage.Storage;
 import org.owpk.storage.impl.LocalFileStorage;
-import org.owpk.utils.serializers.YamlObjectMapper;
+import org.owpk.utils.serializers.Serializer;
 
 import io.micronaut.context.annotation.Context;
 import jakarta.annotation.PreDestroy;
@@ -29,7 +28,7 @@ public class PropertiesManager {
     private final ApplicationMainPropertiesProvider applicationPropertiesProvider;
     private final ApplicationProperties applicationProperties;
 
-    public PropertiesManager(YamlObjectMapper yamlObjectMapper) throws PropertiesProccessingException {
+    public PropertiesManager(Serializer yamlObjectMapper) throws PropertiesProccessingException {
         this.storage = new LocalFileStorage();
         this.appHomeDir = resolveHomeDir(storage);
 
@@ -60,13 +59,18 @@ public class PropertiesManager {
     @PreDestroy
     public void destroy() throws PropertiesProccessingException {
         log.info("Destroying PropertiesManager");
-        applicationPropertiesProvider.save(applicationProperties);
     }
 
     public LlmProviderProperties getLlmProviderProperties(LlmSupports.KnownLlm llm) {
         return Arrays.stream(this.applicationProperties.getLlmProviders())
                 .collect(Collectors.toMap(it -> LlmSupports.KnownLlm.of(it.getProvider()), Function.identity()))
                 .get(llm);
+    }
+
+    public LlmProviderProperties getDefaultLlmProperties() {
+        return Arrays.stream(this.applicationProperties.getLlmProviders())
+                .collect(Collectors.toMap(it -> LlmSupports.KnownLlm.of(it.getProvider()), Function.identity()))
+                .get(LlmSupports.KnownLlm.of(this.applicationProperties.getDefaulProvider()));
     }
 
 }

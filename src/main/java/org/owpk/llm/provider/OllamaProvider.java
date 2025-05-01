@@ -11,9 +11,11 @@ import org.owpk.llm.client.ollama.client.model.OllamaGenerateRequest;
 import org.owpk.llm.provider.mcp.McpMessage;
 import org.owpk.llm.provider.model.ChatRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class OllamaProvider extends LlmProvider<OllamaClient> {
 
 	public OllamaProvider(OllamaClient ollamaClient, LlmProviderProperties properties) {
@@ -42,7 +44,12 @@ public class OllamaProvider extends LlmProvider<OllamaClient> {
 		return getApiClient()
 				.chat(OllamaChatRequest.builder()
 						.model(getProperties().getModel())
-						.messages(messages.stream().map(it -> new OllamaChatMessage()).toList())
+						.messages(messages.stream()
+								.map(it -> OllamaChatMessage.builder()
+										.content(it.getMessage())
+										.role(it.getRole().toLowerCase())
+										.build())
+								.toList())
 						.stream(true)
 						.build())
 				.map(response -> response.getMessage().getContent());

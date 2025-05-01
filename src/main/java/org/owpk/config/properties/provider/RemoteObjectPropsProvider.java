@@ -46,12 +46,7 @@ public class RemoteObjectPropsProvider<T> extends AbstractObjectPropertiesProvid
 
 	@Override
 	public void onPropertiesChanged(T value) {
-		log.info("Properties changed: {}", value);
-		try {
-			save(value);
-		} catch (PropertiesProccessingException e) {
-			log.error("Failed to save properties after change: {}", e.getMessage());
-		}
+		save(value);
 	}
 
 	private PropertiesProccessingException createPropertiesProccessingException(Exception e) {

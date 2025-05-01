@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'info.picocli:picocli-codegen'
     implementation 'info.picocli:picocli'
@@ -19,14 +20,12 @@ dependencies {
     implementation 'io.micronaut:micronaut-jackson-databind'
     implementation 'io.micronaut.serde:micronaut-serde-jackson'
     // implementation 'io.vavr:vavr:0.10.6'
-    implementation 'org.yaml:snakeyaml:2.4'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'ch.qos.logback:logback-classic'
-    runtimeOnly 'org.yaml:snakeyaml'
 }
 
 application {
-    mainClass = "org.owpk.JllamaCliCommand"
+    mainClass = "org.owpk.Jllama"
 }
 
 graalvmNative {

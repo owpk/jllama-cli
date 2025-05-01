@@ -26,6 +26,13 @@ public class LlmServiceFactory {
 				dialogRepository, rolesManager);
 	}
 
+	public LlmService createLlmService(String provider) {
+		var llm = LlmSupports.KnownLlm.of(provider);
+		var properties = propertiesManager.getLlmProviderProperties(llm);
+		return new LlmService(createProvider(llm, properties),
+				dialogRepository, rolesManager);
+	}
+
 	private LlmProvider<?> createProvider(LlmSupports.KnownLlm llm, LlmProviderProperties properties) {
 		if (llm == LlmSupports.KnownLlm.OLLAMA) {
 			var ollamaClient = new OllamaClientLowLevelImpl(streamingHttpClient, properties.getUrl());

@@ -7,16 +7,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.owpk.config.properties.model.ApplicationProperties;
-import org.owpk.utils.serializers.YamlObjectMapper;
+import org.owpk.utils.serializers.Serializer;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class RolesManager {
-	private final YamlObjectMapper yamlObjectMapper;
+	private final Serializer yamlObjectMapper;
 	private final Map<String, Role> applicationProperties;
 
-	public RolesManager(YamlObjectMapper yamlObjectMapper, ApplicationProperties properties) {
+	public RolesManager(Serializer yamlObjectMapper, ApplicationProperties properties) {
 		this.yamlObjectMapper = yamlObjectMapper;
 		this.applicationProperties = Arrays.stream(properties.getRoles())
 				.map(it -> new Role(it.getName(), it.getPrompt()))
@@ -33,7 +33,7 @@ public class RolesManager {
 			throw new IllegalArgumentException("YAML string cannot be null or empty");
 		}
 		try {
-			return yamlObjectMapper.convert(yaml, Role.class);
+			return yamlObjectMapper.convert(yaml.getBytes(), Role.class);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

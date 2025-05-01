@@ -1,6 +1,6 @@
 package org.owpk.config.properties.provider;
 
-public class PropertiesProccessingException extends Exception {
+public class PropertiesProccessingException extends RuntimeException {
 	public PropertiesProccessingException(String message) {
 		super(message);
 	}

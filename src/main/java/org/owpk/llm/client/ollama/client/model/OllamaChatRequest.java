@@ -4,8 +4,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.ReflectiveAccess;
+import io.micronaut.serde.annotation.SerdeImport;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Generate the next message in a chat with a provided model. This is a
@@ -15,6 +20,11 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Introspected
+@ReflectiveAccess
+@SerdeImport(OllamaChatRequest.class)
 public class OllamaChatRequest {
 
     /** Required - the model name */

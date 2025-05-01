@@ -2,6 +2,7 @@ package org.owpk.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Function;
 
 import org.owpk.llm.provider.LlmProvider;
 import org.owpk.llm.provider.model.ChatRequest;
@@ -12,54 +13,193 @@ import org.owpk.service.role.RolesManager;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Data
 @RequiredArgsConstructor
+@Slf4j
 public class LlmService {
 	private final LlmProvider<?> llmProvider;
 	private final DialogRepository dialogRepository;
 	private final RolesManager rolesManager;
 
+	// /**
+	// * Method for generating text using LLM
+	// *
+	// * @param prompt text prompt
+	// * @param roleId role ID
+	// * @return text response
+	// */
+	// public Flux<String> generate(String prompt, String roleId) {
+	// var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
+
+	// return dialogRepository.createDialog()
+	// .flatMapMany(dialogId -> {
+	// Flux<String> responseStream = llmProvider.generate(prompt, rolePrompt);
+
+	// // Сохраняем сообщения после полного получения ответа
+	// responseStream = responseStream.cache(); // кэшируем поток для повторного
+	// использования
+
+	// Mono<Void> saveOperation = responseStream
+	// .collectList()
+	// .map(responses -> String.join("", responses))
+	// .flatMap(fullResponse -> dialogRepository.saveMessages(dialogId,
+	// List.of(createMessage(prompt, MessageType.USER),
+	// createMessage(fullResponse, MessageType.ASSISTANT))))
+	// .then();
+
+	// // Подписываемся на операцию сохранения, но возвращаем оригинальный поток
+	// return responseStream
+	// .doOnComplete(() -> saveOperation.subscribe());
+	// });
+	// }
+
+	// /**
+	// * Method for chatting with LLM
+	// *
+	// * @param request user request
+	// * @param chatHistoryContextLength chat history context length
+	// * @return text response
+	// */
+	// public Flux<String> chat(String prompt, String roleId, int
+	// chatHistoryContextLength) {
+	// var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
+
+	// var systemRequest = ChatRequest.builder()
+	// .message(rolePrompt)
+	// .role(MessageType.SYSTEM)
+	// .build();
+
+	// var chatRequest = ChatRequest.builder()
+	// .message(prompt)
+	// .role(MessageType.USER)
+	// .build();
+
+	// return dialogRepository.createDialog()
+	// .flatMapMany(dialogId -> {
+	// // Получаем поток сообщений от LLM с учетом контекста
+	// Flux<String> responseStream = dialogRepository.getMessages(dialogId)
+	// .takeLast(chatHistoryContextLength)
+	// .map(it -> ChatRequest.builder()
+	// .message(it.getContent())
+	// .role(it.getType())
+	// .build())
+	// .collectList()
+	// .map(messages -> {
+	// messages.add(systemRequest);
+	// messages.add(chatRequest);
+	// return messages;
+	// })
+	// .flatMapMany(messages -> llmProvider.chat(messages));
+
+	// // Кэшируем поток для повторного использования
+	// responseStream = responseStream.cache();
+
+	// // Создаем операцию сохранения
+	// Mono<Void> saveOperation = responseStream
+	// .collectList()
+	// .map(responses -> String.join("", responses))
+	// .flatMap(fullResponse -> dialogRepository.saveMessages(dialogId,
+	// List.of(createMessage(prompt, MessageType.USER),
+	// createMessage(fullResponse, MessageType.ASSISTANT))))
+	// .then();
+
+	// // Возвращаем поток и подписываемся на сохранение после завершения
+	// return responseStream
+	// .doOnComplete(() -> saveOperation.subscribe());
+	// });
+
+	// }
+
 	/**
-	 * Метод для генерации текста с использованием LLM
+	 * Method for generating text using LLM
 	 *
-	 * @param prompt текстовый запрос
-	 * @param roleId идентификатор роли
-	 * @return сгенерированный текст
+	 * @param prompt text prompt
+	 * @param roleId role ID
+	 * @return text response
 	 */
 	public Flux<String> generate(String prompt, String roleId) {
 		var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
-		var messageBuffer = new StringBuilder();
-
-		return dialogRepository.createDialog()
-				.flatMapMany(dialogId -> llmProvider.generate(prompt, rolePrompt)
-						.doOnNext(responses -> messageBuffer.append(responses))
-						.doOnComplete(() -> dialogRepository.saveMessages(dialogId,
-								List.of(createMessage(prompt, MessageType.USER),
-										createMessage(messageBuffer.toString(), MessageType.ASSISTANT)))
-								.subscribe()));
+		return processLlmResponse(
+				dialogId -> llmProvider.generate(prompt, rolePrompt),
+				prompt);
 	}
 
 	/**
-	 * Метод для общения с LLM
+	 * Method for chatting with LLM
 	 *
-	 * @param request                  запрос от пользователя
-	 * @param chatHistoryContextLength длина контекста истории чата
-	 * @return ответ от LLM
+	 * @param request                  user request
+	 * @param chatHistoryContextLength chat history context length
+	 * @return text response
 	 */
-	public Flux<String> chat(String request, int chatHistoryContextLength) {
-		var message = ChatRequest.builder()
-				.message(request).role(MessageType.USER);
+	public Flux<String> chat(String prompt, String roleId, int chatHistoryContextLength) {
+		var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
+		var systemRequest = ChatRequest.builder()
+				.message(rolePrompt)
+				.role(MessageType.SYSTEM)
+				.build();
+		var chatRequest = ChatRequest.builder()
+				.message(prompt)
+				.role(MessageType.USER)
+				.build();
 
-		throw new UnsupportedOperationException("Unimplemented method 'chat'");
+		return processLlmResponse(
+				dialogId -> prepareAndExecuteChatRequest(dialogId, chatHistoryContextLength, systemRequest,
+						chatRequest),
+				prompt);
+	}
+
+	private Flux<String> prepareAndExecuteChatRequest(
+			String dialogId,
+			int chatHistoryContextLength,
+			ChatRequest systemRequest,
+			ChatRequest chatRequest) {
+		return dialogRepository.getMessages(dialogId)
+				.takeLast(chatHistoryContextLength)
+				.map(it -> ChatRequest.builder()
+						.message(it.getContent())
+						.role(it.getType())
+						.build())
+				.collectList()
+				.doOnNext(messages -> {
+					log.debug("Chat history messages: {}", messages);
+				})
+				.map(messages -> {
+					messages.add(systemRequest);
+					messages.add(chatRequest);
+					return messages;
+				})
+				.flatMapMany(messages -> llmProvider.chat(messages));
+	}
+
+	private Flux<String> processLlmResponse(
+			Function<String, Flux<String>> responseProvider,
+			String prompt) {
+		return dialogRepository.createDialog()
+				.flatMapMany(dialogId -> {
+					Flux<String> responseStream = responseProvider.apply(dialogId).cache();
+
+					Mono<Void> saveOperation = responseStream
+							.collectList()
+							.map(responses -> String.join("", responses))
+							.flatMap(fullResponse -> dialogRepository.saveMessages(dialogId,
+									List.of(createMessage(prompt, MessageType.USER),
+											createMessage(fullResponse, MessageType.ASSISTANT))))
+							.then();
+
+					return responseStream
+							.doOnComplete(() -> saveOperation.subscribe());
+				});
 	}
 
 	private Message createMessage(String content, MessageType type) {
 		return Message.builder()
 				.content(content)
 				.type(type)
-				.timestamp(LocalDateTime.now())
+				.timestamp(LocalDateTime.now().toString())
 				.build();
 	}
 

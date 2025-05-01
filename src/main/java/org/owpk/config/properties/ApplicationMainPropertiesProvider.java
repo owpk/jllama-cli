@@ -1,4 +1,4 @@
-package org.owpk.config.properties.provider.domain;
+package org.owpk.config.properties;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class ApplicationMainPropertiesProvider implements ObjectPropsProvider<Ap
 				getSupportedLlmProviders().toArray(LlmProviderProperties[]::new),
 				DefaultRoles.getDefaultRoles().stream().map(this::toRoleProps).toArray(RoleProps[]::new),
 				LlmSupports.KnownLlm.OLLAMA.getName(),
-				"You are a helpful assistant.", "");
+				DefaultRoles.getDEFAULT().getId(), "", "");
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class ApplicationMainPropertiesProvider implements ObjectPropsProvider<Ap
 
 	@Override
 	public void onPropertiesChanged(ApplicationProperties value) {
-		log.info("Properties changed: " + this.getClass().getSimpleName());
+		delegate.onPropertiesChanged(value);
 	}
 
 	private List<LlmProviderProperties> getSupportedLlmProviders() {
