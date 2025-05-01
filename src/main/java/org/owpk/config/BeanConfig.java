@@ -1,21 +1,53 @@
 package org.owpk.config;
 
-import org.owpk.config.properties.core.PropertiesManager;
-import org.owpk.llm.ollama.client.OllamaProps;
+import java.util.Optional;
+
+import org.owpk.config.properties.AppPropertiesConstants;
+import org.owpk.config.properties.PropertiesManager;
+import org.owpk.llm.LlmProviderFactoryImpl;
+import org.owpk.llm.provider.dialog.DialogRepository;
+import org.owpk.llm.provider.role.RolesManager;
+import org.owpk.utils.YamlObjectMapper;
 
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
+import io.micronaut.http.client.StreamingHttpClient;
+import io.micronaut.http.client.annotation.Client;
+import lombok.extern.slf4j.Slf4j;
 
 @Factory
+@Slf4j
 public class BeanConfig {
+	@Bean
+	public YamlObjectMapper yamlObjectMapper() {
+		return new YamlObjectMapper();
+	}
 
-    @Bean
-    public PropertiesManager propertiesManager() {
-        return new PropertiesManager();
-    }
+	@Bean
+	public RolesManager rolesManager(YamlObjectMapper yamlObjectMapper, PropertiesManager manager) {
+		return new RolesManager(yamlObjectMapper, manager.getApplicationProperties());
+	}
 
-    @Bean
-    public DynamicHttpClientUrlFilter dynamicBaseUrlFilter(PropertiesManager propertiesManager) {
-        return new DynamicHttpClientUrlFilter((OllamaProps) propertiesManager.getProvider(OllamaProps.class));
-    }
+	@Bean
+	public DialogRepository dialogRepository(PropertiesManager propertiesManager) {
+		var applicationProperties = propertiesManager.getApplicationProperties();
+		var chatsPath = Optional.ofNullable(applicationProperties.getChatsPath()).orElse("");
+
+		var storage = propertiesManager.getStorage(); // TODO default is home directory storage, maybe change later
+														// according to configuration e.g. chat storage type
+		if (chatsPath.isBlank() || !storage.exists(chatsPath)) {
+			log.info("Creating default chats directory {}, because it does not exist", chatsPath);
+			chatsPath = storage.createFileOrDirIfNotExists(true, propertiesManager.getAppHomeDir(),
+					AppPropertiesConstants.APP_CHATS_DIR_NAME);
+			applicationProperties.setChatsPath(chatsPath);
+		}
+
+		return new DialogRepository(storage, applicationProperties);
+	}
+
+	@Bean
+	public LlmProviderFactoryImpl llmProviderFactory(@Client StreamingHttpClient client,
+			DialogRepository dialogRepository, RolesManager rolesManager) {
+		return new LlmProviderFactoryImpl(client, dialogRepository, rolesManager);
+	}
 }

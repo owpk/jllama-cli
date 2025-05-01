@@ -9,7 +9,7 @@ public class FileUtils {
     /**
      * Returns true if file was created, false if it already exists
      */
-    public static boolean createFileWithDirs(String str) {
+    public static String createFileWithDirs(String str) {
         var path = Path.of(str);
         var parent = path.getParent();
         try {
@@ -21,19 +21,17 @@ public class FileUtils {
                 if (!Files.exists(path)) {
                     if (!Files.exists(Files.createDirectory(path)))
                         throw new IllegalStateException("Couldn't create dir: " + path);
-                    return true;
                 }
             } else {
                 if (!Files.exists(path)) {
                     if (!Files.exists(Files.createFile(path)))
                         throw new IllegalStateException("Couldn't create file: " + path);
-                    return true;
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return false;
+        return path.toString();
     }
 
     public static Path createTempFile(byte[] data, String name) {

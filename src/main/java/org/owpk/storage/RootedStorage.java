@@ -42,15 +42,20 @@ public class RootedStorage implements Storage {
         return delegate.exists(concatePath(path));
     }
 
-    @Override
-    public String createFileOrDirIfNotExists(String path) {
-        return delegate.createFileOrDirIfNotExists(concatePath(path));
-    }
-
     private String concatePath(String path) {
         if (storageRoot.endsWith("/"))
             return storageRoot + path;
         return String.format("%s/%s", storageRoot, path);
+    }
+
+    @Override
+    public String createFileOrDirIfNotExists(boolean isDir, String path) {
+        return delegate.createFileOrDirIfNotExists(isDir, concatePath(path));
+    }
+
+    @Override
+    public String createFileOrDirIfNotExists(boolean isDir, String path, String... more) {
+        return delegate.createFileOrDirIfNotExists(isDir, concatePath(path), more);
     }
 
 }

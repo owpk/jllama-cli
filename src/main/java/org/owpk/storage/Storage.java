@@ -11,7 +11,9 @@ public interface Storage {
 
     boolean exists(String path);
 
-    String createFileOrDirIfNotExists(String path);
+    String createFileOrDirIfNotExists(boolean isDir, String path);
+
+    String createFileOrDirIfNotExists(boolean isDir, String path, String... more);
 
     boolean saveContent(String path, byte[] composedArray, boolean append) throws StorageException;
 }

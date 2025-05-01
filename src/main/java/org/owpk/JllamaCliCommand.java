@@ -1,7 +1,9 @@
 package org.owpk;
 
-import org.owpk.llm.ollama.client.OllamaClient;
-import org.owpk.llm.ollama.client.model.OllamaGenerateRequest;
+import org.owpk.config.SupportedLlm;
+import org.owpk.config.properties.PropertiesManager;
+import org.owpk.llm.provider.LlmProviderFactory;
+import org.owpk.llm.provider.role.def.DefaultRoles;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import jakarta.inject.Inject;
@@ -14,11 +16,14 @@ public class JllamaCliCommand implements Runnable {
     @Option(names = { "-v", "--verbose" }, description = "...")
     boolean verbose;
 
-    private final OllamaClient client;
+    private final LlmProviderFactory llmProviderFactory;
+    private final PropertiesManager propertiesManager;
 
     @Inject
-    public JllamaCliCommand(OllamaClient ollamaClient) {
-        this.client = ollamaClient;
+    public JllamaCliCommand(LlmProviderFactory llmProviderFactory,
+            PropertiesManager propertiesManager) {
+        this.llmProviderFactory = llmProviderFactory;
+        this.propertiesManager = propertiesManager;
     }
 
     public static void main(String[] args) throws Exception {
@@ -26,19 +31,11 @@ public class JllamaCliCommand implements Runnable {
     }
 
     public void run() {
-        var request = OllamaGenerateRequest.builder()
-                .model("qwen2.5-coder:7b")
-                .prompt("write c++ simple programm")
-                .stream(true)
-                .build();
-
-        client.generate(request)
-                .doOnNext(response -> {
-                    if (response.getResponse() != null) {
-                        System.out.print(response.getResponse());
-                    }
-                })
-                .doOnComplete(() -> System.out.println("\nГотово"))
+        var ollamaProperties = propertiesManager.getLlmProviderProperties(SupportedLlm.OLLAMA);
+        var llmProvider = llmProviderFactory.createProvider(SupportedLlm.OLLAMA, ollamaProperties);
+        llmProvider.generate("search all java projects in home dir", DefaultRoles.getSHELL().getId())
+                .doOnNext(it -> System.out.print(it))
+                .doOnComplete(() -> System.out.println(""))
                 .blockLast();
     }
 }

@@ -70,8 +70,13 @@ public class LocalFileStorage implements Storage {
     }
 
     @Override
-    public String createFileOrDirIfNotExists(String path) {
-        return FileUtils.createFileWithDirs(path) ? path : null;
+    public String createFileOrDirIfNotExists(boolean isDir, String path) {
+        return FileUtils.createFileWithDirs(path + (isDir ? "/" : ""));
+    }
+
+    @Override
+    public String createFileOrDirIfNotExists(boolean isDir, String path, String... more) {
+        return this.createFileOrDirIfNotExists(isDir, Path.of(path, more).toString());
     }
 
 }
