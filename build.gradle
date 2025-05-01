@@ -31,7 +31,7 @@ application {
 graalvmNative {
     binaries {
         main {
-            imageName.set('ollamacli') 
+            imageName.set('jllama') 
             // buildArgs.add('-Ob') 
         }
     }
