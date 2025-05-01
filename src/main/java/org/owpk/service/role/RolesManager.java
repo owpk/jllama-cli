@@ -1,4 +1,4 @@
-package org.owpk.llm.provider.role;
+package org.owpk.service.role;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.owpk.config.properties.model.ApplicationProperties;
-import org.owpk.utils.YamlObjectMapper;
+import org.owpk.utils.serializers.YamlObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +29,13 @@ public class RolesManager {
 	}
 
 	public Role parseRole(String yaml) {
-		return yamlObjectMapper.convert(yaml, Role.class);
+		if (yaml == null || yaml.isBlank()) {
+			throw new IllegalArgumentException("YAML string cannot be null or empty");
+		}
+		try {
+			return yamlObjectMapper.convert(yaml, Role.class);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

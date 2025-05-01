@@ -1,4 +1,4 @@
-package org.owpk.llm.provider.dialog;
+package org.owpk.service.dialog;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class DialogRepository implements DialogRepo {
+public class DialogRepositoryImpl implements DialogRepository {
 	private final Storage storage;
 	private final ApplicationProperties properties;
 	private final ObjectMapper objectMapper = new ObjectMapper();

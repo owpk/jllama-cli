@@ -1,6 +1,6 @@
-package org.owpk.llm.provider.role.def;
+package org.owpk.service.role.def;
 
-import org.owpk.llm.provider.role.Role;
+import org.owpk.service.role.Role;
 
 class GitCommitRolePrompt extends Role {
 	GitCommitRolePrompt() {

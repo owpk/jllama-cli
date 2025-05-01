@@ -1,8 +1,8 @@
-package org.owpk.llm.provider.role.def;
+package org.owpk.service.role.def;
 
 import java.util.List;
 
-import org.owpk.llm.provider.role.Role;
+import org.owpk.service.role.Role;
 
 import lombok.Getter;
 
@@ -20,6 +20,6 @@ public final class DefaultRoles {
 	private static final Role GIT_COMMIT = new GitCommitRolePrompt();
 
 	public static List<Role> getDefaultRoles() {
-		return List.of(getSHELL(), getDESCRIBE(), getGIT_COMMIT());
+		return List.of(getDEFAULT(), getSHELL(), getDESCRIBE(), getGIT_COMMIT());
 	}
 }

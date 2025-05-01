@@ -1,4 +1,4 @@
-package org.owpk.llm.provider.role;
+package org.owpk.service.role;
 
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +23,6 @@ public class Role {
 	}
 
 	public String getPrompt() {
-		return prompt + (expected.isEmpty() ? "" : "\nexpected: " + expected);
+		return prompt + (expected == null || expected.isEmpty() ? "" : "\nexpected: " + expected);
 	}
 }

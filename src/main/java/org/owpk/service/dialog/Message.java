@@ -1,9 +1,9 @@
-package org.owpk.llm.provider.dialog;
+package org.owpk.service.dialog;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import org.owpk.service.model.MessageType;
+import org.owpk.llm.provider.model.MessageType;
 
 import lombok.Builder;
 import lombok.Data;

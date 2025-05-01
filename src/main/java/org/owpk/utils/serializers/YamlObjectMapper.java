@@ -1,4 +1,4 @@
-package org.owpk.utils;
+package org.owpk.utils.serializers;
 
 import java.util.Set;
 
@@ -45,14 +45,14 @@ public class YamlObjectMapper implements Serializer {
 		this.yaml = new Yaml(representer, options);
 	}
 
-	public <T> T convert(String yamlObject, Class<T> cl) {
+	public <T> T convert(String yamlObject, Class<T> cl) throws SerializingException {
 		T object = yaml.loadAs(yamlObject, cl);
 		if (object == null)
-			throw new RuntimeException("Failed to load YAML properties: object is null");
+			throw new SerializingException("Failed to load YAML properties: object is null");
 		return object;
 	}
 
-	public String dumpToString(Object value) {
+	public String dumpToString(Object value) throws SerializingException {
 		var string = yaml.dumpAs(value, Tag.MAP, null);
 		if (string == null)
 			throw new RuntimeException("Cannot dump yaml object: " + value);
@@ -60,13 +60,13 @@ public class YamlObjectMapper implements Serializer {
 	}
 
 	@Override
-	public <T> T convert(byte[] data, Class<T> clazz) {
+	public <T> T convert(byte[] data, Class<T> clazz) throws SerializingException {
 		String yamlString = new String(data);
 		return convert(yamlString, clazz);
 	}
 
 	@Override
-	public <T> byte[] dump(T obj) {
+	public <T> byte[] dump(T obj) throws SerializingException {
 		String yamlString = dumpToString(obj);
 		return yamlString.getBytes();
 	}

@@ -3,14 +3,13 @@ package org.owpk.config.properties.provider.domain;
 import java.util.List;
 
 import org.owpk.config.LlmSupports;
-import org.owpk.config.SupportedLlm;
 import org.owpk.config.properties.model.ApplicationProperties;
 import org.owpk.config.properties.model.LlmProviderProperties;
 import org.owpk.config.properties.model.RoleProps;
 import org.owpk.config.properties.provider.ObjectPropsProvider;
 import org.owpk.config.properties.provider.PropertiesProccessingException;
-import org.owpk.llm.provider.role.Role;
-import org.owpk.llm.provider.role.def.DefaultRoles;
+import org.owpk.service.role.Role;
+import org.owpk.service.role.def.DefaultRoles;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +26,7 @@ public class ApplicationMainPropertiesProvider implements ObjectPropsProvider<Ap
 		return new ApplicationProperties(
 				getSupportedLlmProviders().toArray(LlmProviderProperties[]::new),
 				DefaultRoles.getDefaultRoles().stream().map(this::toRoleProps).toArray(RoleProps[]::new),
-				SupportedLlm.OLLAMA.getName(),
+				LlmSupports.KnownLlm.OLLAMA.getName(),
 				"You are a helpful assistant.", "");
 	}
 

@@ -1,6 +1,6 @@
 package org.owpk.config.properties.provider;
 
-import org.owpk.utils.Serializer;
+import org.owpk.utils.serializers.Serializer;
 
 public abstract class AbstractObjectPropertiesProvider<T> implements ObjectPropsProvider<T> {
 	protected final Serializer serializer;

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.owpk.config.SupportedLlm;
+import org.owpk.config.LlmSupports;
 import org.owpk.config.properties.model.ApplicationProperties;
 import org.owpk.config.properties.model.LlmProviderProperties;
 import org.owpk.config.properties.provider.PropertiesProccessingException;
@@ -12,7 +12,7 @@ import org.owpk.config.properties.provider.RemoteObjectPropsProvider;
 import org.owpk.config.properties.provider.domain.ApplicationMainPropertiesProvider;
 import org.owpk.storage.Storage;
 import org.owpk.storage.impl.LocalFileStorage;
-import org.owpk.utils.YamlObjectMapper;
+import org.owpk.utils.serializers.YamlObjectMapper;
 
 import io.micronaut.context.annotation.Context;
 import jakarta.annotation.PreDestroy;
@@ -63,9 +63,9 @@ public class PropertiesManager {
         applicationPropertiesProvider.save(applicationProperties);
     }
 
-    public LlmProviderProperties getLlmProviderProperties(SupportedLlm llm) {
+    public LlmProviderProperties getLlmProviderProperties(LlmSupports.KnownLlm llm) {
         return Arrays.stream(this.applicationProperties.getLlmProviders())
-                .collect(Collectors.toMap(it -> SupportedLlm.of(it.getProvider()), Function.identity()))
+                .collect(Collectors.toMap(it -> LlmSupports.KnownLlm.of(it.getProvider()), Function.identity()))
                 .get(llm);
     }
 

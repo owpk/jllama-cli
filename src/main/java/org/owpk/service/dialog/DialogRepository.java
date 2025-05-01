@@ -1,11 +1,11 @@
-package org.owpk.llm.provider.dialog;
+package org.owpk.service.dialog;
 
 import java.util.List;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface DialogRepo {
+public interface DialogRepository {
 
 	/**
 	 * Создает новый диалог

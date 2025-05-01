@@ -1,4 +1,4 @@
-package org.owpk.llm.provider.dialog;
+package org.owpk.service.dialog;
 
 import lombok.Data;
 

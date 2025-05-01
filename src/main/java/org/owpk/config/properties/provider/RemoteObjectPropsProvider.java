@@ -1,7 +1,8 @@
 package org.owpk.config.properties.provider;
 
 import org.owpk.storage.Storage;
-import org.owpk.utils.Serializer;
+import org.owpk.utils.serializers.Serializer;
+import org.owpk.utils.serializers.SerializingException;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,18 +23,25 @@ public class RemoteObjectPropsProvider<T> extends AbstractObjectPropertiesProvid
 	public T load() throws PropertiesProccessingException {
 		var data = storage.getContent(path);
 		if (data == null) {
-			throw new PropertiesProccessingException("Failed to load properties from path: " + path);
+			throw createPropertiesProccessingException(new NullPointerException());
 		}
-		return serializer.convert(data, cl);
+		try {
+			return serializer.convert(data, cl);
+		} catch (SerializingException e) {
+			throw createPropertiesProccessingException(e);
+		}
 	}
 
 	@Override
 	public void save(T value) throws PropertiesProccessingException {
-		var data = serializer.dump(value);
-		if (data == null) {
-			throw new PropertiesProccessingException("Failed to serialize properties to path: " + path);
+		try {
+			var data = serializer.dump(value);
+			if (data == null)
+				throw createPropertiesProccessingException(new NullPointerException());
+			storage.saveContent(path, data, false);
+		} catch (SerializingException e) {
+			throw createPropertiesProccessingException(e);
 		}
-		storage.saveContent(path, data, false);
 	}
 
 	@Override
@@ -44,5 +52,9 @@ public class RemoteObjectPropsProvider<T> extends AbstractObjectPropertiesProvid
 		} catch (PropertiesProccessingException e) {
 			log.error("Failed to save properties after change: {}", e.getMessage());
 		}
+	}
+
+	private PropertiesProccessingException createPropertiesProccessingException(Exception e) {
+		return new PropertiesProccessingException("Failed to serialize properties to path: " + path, e);
 	}
 }

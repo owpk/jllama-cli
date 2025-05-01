@@ -1,9 +1,8 @@
 package org.owpk;
 
-import org.owpk.config.SupportedLlm;
-import org.owpk.config.properties.PropertiesManager;
-import org.owpk.llm.provider.LlmProviderFactory;
-import org.owpk.llm.provider.role.def.DefaultRoles;
+import org.owpk.config.LlmSupports;
+import org.owpk.service.LlmServiceFactory;
+import org.owpk.service.role.def.DefaultRoles;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import jakarta.inject.Inject;
@@ -16,14 +15,15 @@ public class JllamaCliCommand implements Runnable {
     @Option(names = { "-v", "--verbose" }, description = "...")
     boolean verbose;
 
-    private final LlmProviderFactory llmProviderFactory;
-    private final PropertiesManager propertiesManager;
+    @Option(names = { "-p", "--provider" }, description = "LLM provider identifier (e.g. ollama)")
+    String provider;
+
+    private final LlmServiceFactory llmServiceFactory;
 
     @Inject
-    public JllamaCliCommand(LlmProviderFactory llmProviderFactory,
-            PropertiesManager propertiesManager) {
-        this.llmProviderFactory = llmProviderFactory;
-        this.propertiesManager = propertiesManager;
+    public JllamaCliCommand(LlmServiceFactory llmFactory) {
+        this.llmServiceFactory = llmFactory;
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -31,11 +31,11 @@ public class JllamaCliCommand implements Runnable {
     }
 
     public void run() {
-        var ollamaProperties = propertiesManager.getLlmProviderProperties(SupportedLlm.OLLAMA);
-        var llmProvider = llmProviderFactory.createProvider(SupportedLlm.OLLAMA, ollamaProperties);
-        llmProvider.generate("search all java projects in home dir", DefaultRoles.getSHELL().getId())
+        var ollama = LlmSupports.KnownLlm.OLLAMA;
+        var llmService = llmServiceFactory.createLlmService(ollama);
+
+        llmService.generate("Самые крупные животные на планете", DefaultRoles.getDEFAULT().getId())
                 .doOnNext(it -> System.out.print(it))
-                .doOnComplete(() -> System.out.println(""))
                 .blockLast();
     }
 }

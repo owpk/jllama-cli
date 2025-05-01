@@ -4,10 +4,11 @@ import java.util.Optional;
 
 import org.owpk.config.properties.AppPropertiesConstants;
 import org.owpk.config.properties.PropertiesManager;
-import org.owpk.llm.LlmProviderFactoryImpl;
-import org.owpk.llm.provider.dialog.DialogRepository;
-import org.owpk.llm.provider.role.RolesManager;
-import org.owpk.utils.YamlObjectMapper;
+import org.owpk.service.LlmServiceFactory;
+import org.owpk.service.dialog.DialogRepository;
+import org.owpk.service.dialog.DialogRepositoryImpl;
+import org.owpk.service.role.RolesManager;
+import org.owpk.utils.serializers.YamlObjectMapper;
 
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Factory
 @Slf4j
 public class BeanConfig {
+
 	@Bean
 	public YamlObjectMapper yamlObjectMapper() {
 		return new YamlObjectMapper();
@@ -42,12 +44,13 @@ public class BeanConfig {
 			applicationProperties.setChatsPath(chatsPath);
 		}
 
-		return new DialogRepository(storage, applicationProperties);
+		return new DialogRepositoryImpl(storage, applicationProperties);
 	}
 
 	@Bean
-	public LlmProviderFactoryImpl llmProviderFactory(@Client StreamingHttpClient client,
+	public LlmServiceFactory llmServiceFactory(@Client StreamingHttpClient httpClient,
+			PropertiesManager propertiesManager,
 			DialogRepository dialogRepository, RolesManager rolesManager) {
-		return new LlmProviderFactoryImpl(client, dialogRepository, rolesManager);
+		return new LlmServiceFactory(httpClient, propertiesManager, dialogRepository, rolesManager);
 	}
 }

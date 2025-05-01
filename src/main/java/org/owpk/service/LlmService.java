@@ -3,16 +3,19 @@ package org.owpk.service;
 import org.owpk.llm.provider.LlmProvider;
 import org.owpk.llm.provider.model.ChatRequest;
 import org.owpk.llm.provider.model.MessageType;
+import org.owpk.service.dialog.DialogRepository;
+import org.owpk.service.role.RolesManager;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Data
 @RequiredArgsConstructor
 public class LlmService {
 	private final LlmProvider<?> llmProvider;
+	private final DialogRepository dialogRepository;
+	private final RolesManager rolesManager;
 
 	/**
 	 * Метод для генерации текста с использованием LLM
@@ -22,43 +25,14 @@ public class LlmService {
 	 * @return сгенерированный текст
 	 */
 	public Flux<String> generate(String prompt, String roleId) {
-		return Mono.just(request)
-				.flatMap(req -> {
-					if (req.getDialogId() == null) {
-						// Создаем новый диалог
-						return llmProvider.startDialog(req.getRoleId());
-					}
-					return Mono.just(req.getDialogId());
-				})
-				.flatMapMany(dialogId -> {
-					// Создаем сообщение пользователя
-					Message userMessage = Message.builder()
-							.id(UUID.randomUUID().toString())
-							.dialogId(dialogId)
-							.content(request.getMessage())
-							.timestamp(LocalDateTime.now())
-							.type(MessageType.USER)
-							.build();
-
-					// Получаем ответ от LLM
-					return llmProvider.chat(request.getMessage(), request.getRoleId())
-							.collectList()
-							.flatMap(responses -> {
-								// Создаем сообщение от ассистента
-								Message assistantMessage = Message.builder()
-										.id(UUID.randomUUID().toString())
-										.dialogId(dialogId)
-										.content(String.join("", responses))
-										.timestamp(LocalDateTime.now())
-										.type(MessageType.ASSISTANT)
-										.build();
-
-								// Сохраняем сообщения
-								return llmProvider.saveDialog(dialogId,
-										Arrays.asList(userMessage, assistantMessage))
-										.thenReturn(responses);
-							})
-							.flatMapMany(Flux::fromIterable);
+		var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
+		var messageBuffer = new StringBuilder();
+		return llmProvider.generate(prompt, rolePrompt)
+				.doOnNext(responses -> {
+					// Сохраняем ответ в буфер
+					messageBuffer.append(responses);
+				}).doOnComplete(() -> {
+					System.out.println("Init saving message: " + messageBuffer.toString().length());
 				});
 	}
 
@@ -74,43 +48,5 @@ public class LlmService {
 				.message(request).role(MessageType.USER);
 
 		throw new UnsupportedOperationException("Unimplemented method 'chat'");
-		// return Mono.just(request)
-		// .flatMap(req -> {
-		// if (req.getDialogId() == null) {
-		// // Создаем новый диалог
-		// return llmProvider.startDialog(req.getRoleId());
-		// }
-		// return Mono.just(req.getDialogId());
-		// })
-		// .flatMapMany(dialogId -> {
-		// // Создаем сообщение пользователя
-		// Message userMessage = Message.builder()
-		// .id(UUID.randomUUID().toString())
-		// .dialogId(dialogId)
-		// .content(request.getMessage())
-		// .timestamp(LocalDateTime.now())
-		// .type(MessageType.USER)
-		// .build();
-
-		// // Получаем ответ от LLM
-		// return llmProvider.chat(request.getMessage(), request.getRoleId())
-		// .collectList()
-		// .flatMap(responses -> {
-		// // Создаем сообщение от ассистента
-		// Message assistantMessage = Message.builder()
-		// .id(UUID.randomUUID().toString())
-		// .dialogId(dialogId)
-		// .content(String.join("", responses))
-		// .timestamp(LocalDateTime.now())
-		// .type(MessageType.ASSISTANT)
-		// .build();
-
-		// // Сохраняем сообщения
-		// return llmProvider.saveDialog(dialogId,
-		// Arrays.asList(userMessage, assistantMessage))
-		// .thenReturn(responses);
-		// })
-		// .flatMapMany(Flux::fromIterable);
-		// });
 	}
 }
