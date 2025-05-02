@@ -13,7 +13,17 @@ A command-line interface for interacting with Ollama LLM models, designed for se
 ## Installation
  ### 1. Manual (preferred)
  #### Option 1: Super fast native image executable
- > YOU NEED JAVA 21+ GRAAL VM SDK
+
+> ⚠️ **Important note**: When creating a native image with GraalVM, you may encounter some complications:
+>
+> - On some platforms (especially Windows), the build process may fail due to missing development tools
+> - Environment variables and paths to GraalVM must be correctly configured
+> - There may be issues with reflection and dynamic class loading, which may require additional configuration
+> - Build times may vary significantly on different machines
+>
+> It is recommended to use the latest version of GraalVM and ensure that all required dependencies are present before starting the build.
+
+ > ⚠️ YOU NEED JAVA 21+ GRAAL VM SDK
 - build native image
 ```sh
 ./gradlew clean nativeBuild
@@ -22,10 +32,10 @@ A command-line interface for interacting with Ollama LLM models, designed for se
 
 - Run it with:
 ```sh
-./jllama chat "hello help me please"
+./jllama chat "Hello, help me please"
 ```
  #### Option 2: Very stable but slow plain `jar` file:
- > YOU NEED JAVA 21+
+ > ⚠️ YOU NEED JAVA 21+
 - build project
  ```sh
  ./gradlew clean build
@@ -34,7 +44,7 @@ A command-line interface for interacting with Ollama LLM models, designed for se
 
 - Run it with:
 ```sh
-java -jar jllama-cli-*-all.jar chat "hello help me please"
+java -jar jllama-cli-*-all.jar chat "Hello, help me please"
 ```
 
 ### 2. Or download `native executable` or `jar` from releases
@@ -50,9 +60,30 @@ Configuration is stored in:
 
 ### Basic Commands
 
+Basic usage (chat is default command)
+```bash
+jllama "write simple c++ programm and explain code"
+# You can use any message prompts without double quotes
+jllama write simple c++ programm and explain code
+```
+
+Add role
+```bash
+jllama --role-name "roleId from jllama.yaml config" ...
+# or
+jllama -r
+```
+
+Start with new chat (creates new chat file)
+```bash
+jllama --new-chat ...
+# or
+jllama -n
+```
+
 Generate text:
 ```bash
-jllama generate --role "roleId from jllama.yaml config" "Your prompt here"
+jllama generate  Your prompt here
 ```
 
 Chat mode:
@@ -89,6 +120,7 @@ jllama -r describe-shell generate "ls -la | grep '^d'"
 ### Configuration Options
 
 Set LLM provider:
+Ollama is only supported and default by now
 ```bash
 jllama -p ollama generate "Hello"
 ```
@@ -112,7 +144,7 @@ The application is built using:
 ### Planned LLM Provider Support
 - OpenAI API integration
 - Mistral AI support
-- Others maybe :)
+- Maybe others  :)
 
 ### Upcoming Features
 - Image generating / processing
@@ -120,7 +152,7 @@ The application is built using:
 - Advanced parameter configuration (temperature, top_p, etc.)
 - Model Context Protocol (MCP) support for standardized LLM interactions
 - Context window management
-- Ebeddings
+- Embeddings api
 - API key management
 
 ## License
