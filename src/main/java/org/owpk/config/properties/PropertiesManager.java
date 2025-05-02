@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.owpk.config.ApplicationConstants;
 import org.owpk.config.LlmSupports;
 import org.owpk.config.properties.model.ApplicationProperties;
 import org.owpk.config.properties.model.LlmProviderProperties;
@@ -33,7 +34,7 @@ public class PropertiesManager {
         this.appHomeDir = resolveHomeDir(storage);
 
         var mainPropsFilePath = storage.createFileOrDirIfNotExists(false, appHomeDir,
-                AppPropertiesConstants.APP_CONFIG_FILE_NAME);
+                ApplicationConstants.APP_CONFIG_FILE_NAME);
 
         var mainPropsLocalDelegate = new RemoteObjectPropsProvider<>(mainPropsFilePath, storage,
                 ApplicationProperties.class, yamlObjectMapper);
@@ -53,7 +54,7 @@ public class PropertiesManager {
 
     private String resolveHomeDir(Storage storage) {
         var userHome = System.getProperty("user.home");
-        return storage.createFileOrDirIfNotExists(true, userHome, "." + AppPropertiesConstants.APP_NAME);
+        return storage.createFileOrDirIfNotExists(true, userHome, "." + ApplicationConstants.APP_NAME);
     }
 
     @PreDestroy

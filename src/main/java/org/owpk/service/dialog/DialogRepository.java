@@ -12,7 +12,14 @@ public interface DialogRepository {
 	 * 
 	 * @return ID созданного диалога
 	 */
-	Mono<String> createDialog();
+	Mono<String> createNewDialog();
+
+	/**
+	 * Создает новый или возвращает последний диалог
+	 * 
+	 * @return ID созданного диалога
+	 */
+	Mono<String> createOrGetDefaultDialog();
 
 	/**
 	 * Сохраняет сообщения для указанного диалога

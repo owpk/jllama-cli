@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class YamlObjectSerializer implements ComplexSerializer {
-	private final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+	private final ObjectMapper objectMapper;
 	{
+		YAMLFactory yf = new YAMLFactory();
+		yf.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER); // отключаем '---'
+		objectMapper = new ObjectMapper(yf);
 		objectMapper.registerModule(new JavaTimeModule());
 	}
 

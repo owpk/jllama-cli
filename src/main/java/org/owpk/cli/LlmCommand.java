@@ -1,27 +1,36 @@
 package org.owpk.cli;
 
-import java.util.concurrent.Callable;
-
+import org.owpk.config.ApplicationConstants;
 import org.owpk.config.LlmSupports;
 import org.owpk.config.properties.PropertiesManager;
 import org.owpk.service.LlmService;
 import org.owpk.service.LlmServiceFactory;
+import org.owpk.service.dialog.DialogRepository;
+import org.slf4j.Logger;
 
+import io.micronaut.logging.LogLevel;
+import io.micronaut.logging.LoggingSystem;
 import jakarta.inject.Inject;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "ollama-cli", description = "...", mixinStandardHelpOptions = true)
-public class LlmCommand implements Callable<Integer> {
+@Command(name = ApplicationConstants.APP_NAME, description = "...", mixinStandardHelpOptions = true)
+public class LlmCommand implements Runnable {
 
     private final LlmServiceFactory llmServiceFactory;
     private final PropertiesManager propertiesManager;
+    private final DialogRepository dialogRepository;
+    private final LoggingSystem loggingSystem;
 
     @Inject
-    public LlmCommand(LlmServiceFactory llmFactory, PropertiesManager propertiesManager) {
-        this.llmServiceFactory = llmFactory;
+    public LlmCommand(LlmServiceFactory llmServiceFactory, PropertiesManager propertiesManager,
+            DialogRepository dialogRepository, LoggingSystem loggingSystem) {
+        this.llmServiceFactory = llmServiceFactory;
         this.propertiesManager = propertiesManager;
+        this.dialogRepository = dialogRepository;
+        this.loggingSystem = loggingSystem;
     }
 
     @Option(names = { "-p", "--provider" }, description = "LLM provider identifier (e.g. ollama)")
@@ -35,7 +44,22 @@ public class LlmCommand implements Callable<Integer> {
         propertiesManager.getApplicationProperties().setDefaultRoleName(roleId);
     }
 
-    @Command(name = "generate", aliases = { "gen", "g" }, description = "Generate text using LLM")
+    @Option(names = { "-n", "--new-chat" }, description = "Create new chat")
+    public void newChat(boolean newChat) {
+        if (newChat) {
+            dialogRepository.createNewDialog().block();
+        }
+    }
+
+    @Option(names = "--log-level", description = "Set log level: ERROR | INFO | DEBUG", defaultValue = "ERROR", scope = CommandLine.ScopeType.INHERIT)
+    public void setLogLevel(String logLevel) {
+        loggingSystem.setLogLevel(Logger.ROOT_LOGGER_NAME, LogLevel.valueOf(logLevel));
+    }
+
+    @Parameters(description = "message")
+    public String[] message;
+
+    @Command(name = "generate", description = "Generate text using LLM")
     public void generate(@Parameters(description = "Text prompt") String[] prompt) {
         if (prompt.length == 0) {
             System.out.println("Please provide a message to chat.");
@@ -49,7 +73,7 @@ public class LlmCommand implements Callable<Integer> {
                 .blockLast();
     }
 
-    @Command(name = "chat", aliases = { "c" }, description = "Chat with LLM")
+    @Command(name = "chat", description = "Chat with LLM")
     public void chat(@Parameters(description = "Chat message") String[] message) {
         if (message.length == 0) {
             System.out.println("Please provide a message to chat.");
@@ -60,15 +84,14 @@ public class LlmCommand implements Callable<Integer> {
 
         llmService.chat(
                 String.join(" ", message),
-                defaultRole, 10)
+                defaultRole, 4)
                 .doOnNext(it -> System.out.print(it))
                 .blockLast();
     }
 
     @Override
-    public Integer call() throws Exception {
-        System.out.println("Please provide a command.");
-        return 1;
+    public void run() {
+        chat(message);
     }
 
     private LlmService getLlmService() {

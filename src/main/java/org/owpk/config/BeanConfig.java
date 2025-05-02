@@ -2,7 +2,6 @@ package org.owpk.config;
 
 import java.util.Optional;
 
-import org.owpk.config.properties.AppPropertiesConstants;
 import org.owpk.config.properties.PropertiesManager;
 import org.owpk.service.LlmServiceFactory;
 import org.owpk.service.dialog.YamlDialogRepositoryImpl;
@@ -41,7 +40,7 @@ public class BeanConfig {
 		if (chatsPath.isBlank() || !storage.exists(chatsPath)) {
 			log.info("Creating default chats directory {}, because it does not exist", chatsPath);
 			chatsPath = storage.createFileOrDirIfNotExists(true, propertiesManager.getAppHomeDir(),
-					AppPropertiesConstants.APP_CHATS_DIR_NAME);
+					ApplicationConstants.APP_CHATS_DIR_NAME);
 			applicationProperties.setChatsPath(chatsPath);
 			propertiesManager.getApplicationPropertiesProvider().onPropertiesChanged(applicationProperties);
 		}

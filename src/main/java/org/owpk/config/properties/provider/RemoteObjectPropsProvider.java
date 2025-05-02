@@ -39,6 +39,7 @@ public class RemoteObjectPropsProvider<T> extends AbstractObjectPropertiesProvid
 			if (data == null)
 				throw createPropertiesProccessingException(new NullPointerException());
 			storage.saveContent(path, data, false);
+			log.info("Properties saved to path: " + path);
 		} catch (SerializingException e) {
 			throw createPropertiesProccessingException(e);
 		}
@@ -46,6 +47,7 @@ public class RemoteObjectPropsProvider<T> extends AbstractObjectPropertiesProvid
 
 	@Override
 	public void onPropertiesChanged(T value) {
+		log.info("Properties changed: " + value);
 		save(value);
 	}
 
