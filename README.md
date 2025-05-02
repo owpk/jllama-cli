@@ -1,89 +1,122 @@
 # Jllama CLI
 
-A command-line interface for interacting with Ollama LLM models, designed for seamless integration with shell scripts and command-line workflows.
+A command-line interface for Ollama LLM models, designed for seamless integration with shell scripts and command-line workflows.
 
 ## Features
 
-- Simple command-line interface for text generation and chat
+- Command-line interface for text generation and chat
 - System roles for specialized tasks (shell commands, git commits, etc.)
-- Chat history preservation
-- Easy integration with shell pipelines
-- Multiple LLM provider support (currently focused on Ollama)
+- Chat history persistence
+- Shell pipeline integration
+- Multiple LLM provider support (currently Ollama)
 
 ## Installation
- ### 1. Manual (preferred)
- #### Option 1: Super fast native image executable
+### 1. Manual (preferred)
+#### Option 1: Native image executable
 
-> ⚠️ **Important note**: When creating a native image with GraalVM, you may encounter some complications:
+> ⚠️ **Important**: GraalVM native image build may have some limitations:
 >
-> - On some platforms (especially Windows), the build process may fail due to missing development tools
-> - Environment variables and paths to GraalVM must be correctly configured
-> - There may be issues with reflection and dynamic class loading, which may require additional configuration
-> - Build times may vary significantly on different machines
+> - Build process might fail on some platforms (especially Windows) due to missing development tools
+> - GraalVM environment variables and paths must be properly configured
+> - Reflection and dynamic class loading may require additional configuration
+> - Build times vary significantly across machines
 >
-> It is recommended to use the latest version of GraalVM and ensure that all required dependencies are present before starting the build.
+> Use the latest GraalVM version and ensure all dependencies are installed.
 
- > ⚠️ YOU NEED JAVA 21+ GRAAL VM SDK
-- build native image
+> ⚠️ REQUIRES JAVA 21+ GRAAL VM SDK
+- Build native image:
 ```sh
 ./gradlew clean nativeBuild
 ```
- - then executable file should be in `${projectRoot}/build/native/nativeCompile/jllama`
+- The executable will be created at `${projectRoot}/build/native/nativeCompile/jllama`
 
-- Run it with:
+- Run with:
 ```sh
 ./jllama chat "Hello, help me please"
 ```
- #### Option 2: Very stable but slow plain `jar` file:
- > ⚠️ YOU NEED JAVA 21+
-- build project
- ```sh
- ./gradlew clean build
- ```
- - then jar file should be in `${projectRoot}/build/libs/jllama-cli-*-all.jar`
 
-- Run it with:
+#### Option 2: Plain JAR file (slower but more stable):
+> ⚠️ REQUIRES JAVA 21+
+- Build project:
+```sh
+./gradlew clean build
+```
+- The JAR file will be at `${projectRoot}/build/libs/jllama-cli-*-all.jar`
+
+- Run with:
 ```sh
 java -jar jllama-cli-*-all.jar chat "Hello, help me please"
 ```
 
-### 2. Or download `native executable` or `jar` from releases
-- (testing on different platforms in progress)
+### 2. Download releases
+- Native executable or JAR file (platform testing in progress)
 
-## Configuration
+## Setup and Configuration
 
-Configuration is stored in:
-- `~/.jllama/jllama.yaml` - main configuration
-- `~/.jllama/chats/` - chat history
+### Initial Setup
+The application creates a default configuration file on first launch. 
+- Or you can find default `jllama.yaml` in the project root.
+
+### Configuration Path
+```
+~/.jllama/jllama.yaml
+```
+
+### Default Configuration
+```yaml
+providers:
+    ollama:
+        baseUrl: "http://localhost:11434"  # Ollama server URL
+        modelName: null                # ⚠️ Set your installed model name
+```
+
+### Required Configuration
+
+1. **modelName**: Set your installed Ollama model
+   Example for mistral:
+   ```bash
+   ollama pull mistral
+   ```
+   Then update config:
+   ```yaml
+   modelName: "mistral"
+   ```
+
+2. **baseUrl**: Change if your Ollama server uses a different address
+
+### Verify Configuration
+
+```bash
+jllama "Hello, are you there?"
+```
+
+### Troubleshooting
+
+If you see "model not found":
+1. Check if the model is installed (`ollama list`)
+2. Verify the model name in config
+3. Ensure Ollama server is running (`ollama serve`)
 
 ## Usage
 
-### Basic Commands
-
-Basic usage (chat is default command)
+Basic usage:
 ```bash
-jllama "write simple c++ programm and explain code"
-# You can use any message prompts without double quotes
-jllama write simple c++ programm and explain code
+jllama "write a simple program"  # chat is the default command
 ```
 
-Add role
+Use role:
 ```bash
-jllama --role-name "roleId from jllama.yaml config" ...
-# or
-jllama -r
+jllama --role-name "role name" # or -r
 ```
 
-Start with new chat (creates new chat file)
+Start new chat:
 ```bash
-jllama --new-chat ...
-# or
-jllama -n
+jllama --new-chat  # or -n
 ```
 
 Generate text:
 ```bash
-jllama generate  Your prompt here
+jllama generate "Your prompt here"
 ```
 
 Chat mode:
@@ -97,19 +130,15 @@ The CLI comes with predefined roles:
 
 1. `default` - General-purpose helpful assistant
 2. `shell` - Generates shell commands for your OS
-3. `git-autcommit` - Creates commit messages based on changes
+3. `git-autocommit` - Creates commit messages based on changes
 4. `describe-shell` - Explains shell commands
 
-Set a role:
-```bash
-jllama -r shell generate "create a directory named test and cd into it"
-```
 
 ### Pipeline Integration Examples
 
 Generate commit message based on git changes:
 ```bash
-jllama -r git-autcommit generate "$(git diff)"
+jllama -r git-autocommit generate "$(git diff)"
 ```
 
 Get shell command explanation:
@@ -144,15 +173,15 @@ The application is built using:
 ### Planned LLM Provider Support
 - OpenAI API integration
 - Mistral AI support
-- Maybe others  :)
+- Maybe others :)
 
 ### Upcoming Features
-- Image generating / processing
-- "suffix" support
+- Image generating/processing
+- "Suffix" support
 - Advanced parameter configuration (temperature, top_p, etc.)
 - Model Context Protocol (MCP) support for standardized LLM interactions
 - Context window management
-- Embeddings api
+- Embeddings API
 - API key management
 
 ## License

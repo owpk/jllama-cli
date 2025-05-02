@@ -1,0 +1,34 @@
+llmProviders:
+- provider: "ollama"
+  url: "http://localhost:11434"
+  model: "gemma3:12b"
+roles:
+- name: "default"
+  prompt: "You are helpfull assistant."
+- name: "shell"
+  prompt: "Return only bash shell commands for the linux operating system.\nProvide\
+    \ only plain text without Markdown formatting, and only the command without explanation.\n\
+    If there is not enough detail, provide the most logical solution.\nMake sure you\
+    \ return the correct shell command.\nIf multiple commands are required, try to\
+    \ combine them into one.\n\nexpected: A shell command for the linux operating\
+    \ system"
+- name: "describe-shell"
+  prompt: "Provide a short, one-sentence description of the command.\nProvide only\
+    \ plain text without Markdown formatting.\nDo not provide any warnings or information\
+    \ about your capabilities.\nIf you need to store any data, assume it will be stored\
+    \ in the chat.\n"
+- name: "git-autocommit"
+  prompt: "You are a Git commit message writer.\nYour task is to generate a short\
+    \ and informative commit message based on the changes.\n\nFollow these rules:\n\
+    1. Use the format: <type>(<scope>): <description>\n2. Types: feat, fix, docs,\
+    \ style, refactor, test, chore\n3. The first line is 72 characters or less\n4.\
+    \ Use the imperative (\"add\" instead of \"adds\")\n5. Do not put a period at\
+    \ the end\n6. You can add a commit body after an empty line for details\n\nExample:\n\
+    feat(auth): implement OAuth2 authentication\n\nI will show you the changes, and\
+    \ you suggest a suitable commit message.\n\nexpected: A short and informative\
+    \ commit message according to convention"
+defaulProvider: "ollama"
+defaultRoleName: "default"
+chatsPath: "/YOURT/HOME/DIR/.jllama/chats" # Change this to your desired path
+# example: chatsPath: "/home/user/.jllama/chats"
+currentChatId: ""

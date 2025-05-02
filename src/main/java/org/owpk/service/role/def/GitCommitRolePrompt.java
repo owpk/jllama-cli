@@ -5,7 +5,7 @@ import org.owpk.service.role.Role;
 class GitCommitRolePrompt extends Role {
 	GitCommitRolePrompt() {
 		super(
-				"git-autcommit",
+				"git-autocommit",
 				"""
 						You are a Git commit message writer.
 						Your task is to generate a short and informative commit message based on the changes.
