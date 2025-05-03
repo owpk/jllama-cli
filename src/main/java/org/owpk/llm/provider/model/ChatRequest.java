@@ -10,16 +10,27 @@ import lombok.Data;
 @Builder
 public class ChatRequest {
 	private String message;
-	private MessageType role;
+	private String role;
+
+	public static class ChatRequestBuilder {
+		public ChatRequestBuilder role(MessageType type) {
+			this.role = type.getType().toLowerCase();
+			return this;
+		}
+
+		public ChatRequestBuilder role(String role) {
+			this.role = role.toLowerCase();
+			return this;
+		}
+	}
 
 	@JsonGetter
 	public String getRole() {
-		return role.getType();
+		return role;
 	}
 
 	@JsonSetter
 	public void setRole(String role) {
-		role = role.toLowerCase();
-		this.role = MessageType.of(role);
+		this.role = role.toLowerCase();
 	}
 }
