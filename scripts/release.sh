@@ -39,6 +39,7 @@ fi
 # Создаем тег с версией
 git tag -a $VERSION -m "Release $VERSION"
 git push origin $VERSION
+git pushr origin main
 
 echo "🎉 Создан новый релиз $VERSION"
 echo "📦 Тег успешно отправлен в репозиторий"
