@@ -1,6 +1,7 @@
 plugins {
-    id("io.micronaut.application") version "4.5.3"
-    id("com.gradleup.shadow") version "8.3.6"
+    id 'io.micronaut.application' version '4.5.3'
+    id 'com.palantir.git-version' version '0.15.0'
+    id 'com.gradleup.shadow' version '8.3.6'
 }
 
 version = "0.1"
@@ -22,6 +23,42 @@ dependencies {
     // implementation 'io.vavr:vavr:0.10.6'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'ch.qos.logback:logback-classic'
+}
+
+def buildTimeAndDate = new Date()
+def gitDetails = versionDetails()
+
+print gitDetails
+
+version = gitDetails.version ?: "0.0.1"
+
+if (gitDetails.isCleanTag) {
+    version = gitDetails.lastTag
+} else {
+    version = "${gitDetails.lastTag}.${gitDetails.commitDistance}-SNAPSHOT"
+}
+
+var gitHash = gitDetails.gitHash
+var buildTime = buildTimeAndDate.format('yyyy-MM-dd HH:mm:ss')
+
+processResources {
+    filesMatching('**/version.properties') {
+        expand(
+            project_version: version,
+            build_time: buildTime,
+            git_commit: gitHash
+        )
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            'Implementation-Version': version,
+            'Build-Time': buildTime,
+            'Git-Commit': gitHash, 
+        )
+    }
 }
 
 application {
@@ -52,4 +89,42 @@ micronaut {
 
 tasks.named("dockerfileNative") {
     jdkVersion = "21"
+}
+
+task createVersion {
+    doLast {
+        def newVersion = project.hasProperty('newVersion') ? project.newVersion : null
+        if (!newVersion) {
+            throw new GradleException("Please specify version: -PnewVersion=X.Y.Z")
+        }
+        
+        exec {
+            commandLine 'git', 'tag', '-a', "v${newVersion}", '-m', "Release version ${newVersion}"
+        }
+        
+        exec {
+            commandLine 'git', 'push', 'origin', "v${newVersion}"
+        }
+    }
+}
+
+task release {
+    dependsOn 'clean', 'test', 'build', 'createVersion'
+    
+    doLast {
+        println "Released version ${version}"
+    }
+}
+
+task checkVersionProperties {
+    doLast {
+        def resourcesDir = new File(buildDir, 'resources/main')
+        def versionFile = new File(resourcesDir, 'version.properties')
+        if (versionFile.exists()) {
+            println "Version properties content:"
+            println versionFile.text
+        } else {
+            println "Version properties file not found at: ${versionFile.absolutePath}"
+        }
+    }
 }

@@ -1,6 +1,12 @@
 micronaut:
+  server:
+    netty:
+      worker:
+        shutdown:
+          quiet-period: 300ms
+          timeout: 300ms
   application:
-    name: ollama-cli
+    name: jllama
   codec:
     json:
       additional-types:
@@ -8,7 +14,3 @@ micronaut:
   http:
     client:
       read-timeout: 30s
-  
-ollama:
-  props:
-    api-url: ${ollama.api.url:`http://localhost:11434`}
