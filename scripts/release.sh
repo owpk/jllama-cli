@@ -16,15 +16,25 @@ if [ -z "$VERSION" ]; then
     fi
 fi
 
-# Проверяем, что мы на ветке main
+# Сохраняем текущую ветку
 CURRENT_BRANCH=$(git branch --show-current)
-if [ "$CURRENT_BRANCH" != "main" ]; then
-    echo "Ошибка: Вы должны быть на ветке main"
-    exit 1
-fi
+echo "Текущая ветка: $CURRENT_BRANCH"
 
-# Обновляем main
-git pull origin main
+# Переключаемся на main только если мы не на ней
+if [ "$CURRENT_BRANCH" != "main" ]; then
+    echo "Переключаемся на ветку main..."
+    git checkout main
+    
+    # Обновляем main
+    git pull origin main
+    
+    # Делаем merge текущей ветки в main
+    echo "Выполняем merge ветки $CURRENT_BRANCH в main..."
+    git merge $CURRENT_BRANCH
+else
+    echo "Уже находимся на ветке main"
+    git pull origin main
+fi
 
 # Создаем тег с версией
 git tag -a $VERSION -m "Release $VERSION"
@@ -32,3 +42,7 @@ git push origin $VERSION
 
 echo "🎉 Создан новый релиз $VERSION"
 echo "📦 Тег успешно отправлен в репозиторий"
+
+# Возвращаемся на исходную ветку
+git checkout $CURRENT_BRANCH
+echo "Вернулись на исходную ветку: $CURRENT_BRANCH"

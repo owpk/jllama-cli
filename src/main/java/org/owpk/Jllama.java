@@ -46,6 +46,6 @@ import io.micronaut.configuration.picocli.PicocliRunner;
 public class Jllama {
 
 	public static void main(String[] args) throws Exception {
-		PicocliRunner.run(LlmCommand.class, new String[] { "a hello world" });
+		PicocliRunner.run(LlmCommand.class, args);
 	}
 }
