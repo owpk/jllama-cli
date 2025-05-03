@@ -30,6 +30,11 @@ public class BeanConfig {
 	}
 
 	@Bean
+	public VersionManager versionManager() {
+		return new VersionManager();
+	}
+
+	@Bean
 	public YamlDialogRepositoryImpl dialogRepository(ComplexSerializer complexSerializer,
 			PropertiesManager propertiesManager) {
 		var applicationProperties = propertiesManager.getApplicationProperties();

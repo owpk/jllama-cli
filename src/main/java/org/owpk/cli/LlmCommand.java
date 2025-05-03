@@ -2,6 +2,7 @@ package org.owpk.cli;
 
 import org.owpk.config.ApplicationConstants;
 import org.owpk.config.LlmSupports;
+import org.owpk.config.VersionManager;
 import org.owpk.config.properties.PropertiesManager;
 import org.owpk.service.LlmService;
 import org.owpk.service.LlmServiceFactory;
@@ -16,21 +17,32 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = ApplicationConstants.APP_NAME, description = "...", mixinStandardHelpOptions = true)
+@Command(name = ApplicationConstants.APP_NAME, description = "", mixinStandardHelpOptions = true)
 public class LlmCommand implements Runnable {
 
     private final LlmServiceFactory llmServiceFactory;
     private final PropertiesManager propertiesManager;
     private final DialogRepository dialogRepository;
     private final LoggingSystem loggingSystem;
+    private final VersionManager versionManager;
 
     @Inject
     public LlmCommand(LlmServiceFactory llmServiceFactory, PropertiesManager propertiesManager,
-            DialogRepository dialogRepository, LoggingSystem loggingSystem) {
+            DialogRepository dialogRepository, LoggingSystem loggingSystem, VersionManager versionManager) {
         this.llmServiceFactory = llmServiceFactory;
         this.propertiesManager = propertiesManager;
         this.dialogRepository = dialogRepository;
         this.loggingSystem = loggingSystem;
+        this.versionManager = versionManager;
+    }
+
+    @Option(names = { "-v", "--version" }, description = "Version info")
+    public void version(boolean version) {
+        if (version) {
+            System.out.println(
+                    versionManager.getVersionInfo().version());
+            System.exit(0);
+        }
     }
 
     @Option(names = { "-p", "--provider" }, description = "LLM provider identifier (e.g. ollama)")
@@ -91,7 +103,7 @@ public class LlmCommand implements Runnable {
 
     @Override
     public void run() {
-        chat(new String[] { "hello" });
+        chat(message);
     }
 
     private LlmService getLlmService() {
