@@ -91,7 +91,7 @@ public class LlmCommand implements Runnable {
 
     @Override
     public void run() {
-        chat(message);
+        chat(new String[] { "hello" });
     }
 
     private LlmService getLlmService() {

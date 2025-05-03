@@ -79,7 +79,7 @@ public class YamlDialogRepositoryImpl implements DialogRepository {
 	private Mono<String> createDialog(boolean isNew) {
 		var properties = propertiesManager.getApplicationProperties();
 		if (!isNew)
-			if (properties.getCurrentChatId() != null)
+			if (properties.getCurrentChatId() != null && !properties.getCurrentChatId().isBlank())
 				return Mono.just(properties.getCurrentChatId());
 
 		String dialogId = generateChatName();
