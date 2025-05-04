@@ -12,6 +12,7 @@ public class YamlObjectSerializer implements ComplexSerializer {
 	{
 		YAMLFactory yf = new YAMLFactory();
 		yf.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER); // отключаем '---'
+		yf.enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE); // включаем блочный стиль
 		objectMapper = new ObjectMapper(yf);
 		objectMapper.registerModule(new JavaTimeModule());
 	}

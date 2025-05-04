@@ -103,6 +103,12 @@ public class LlmCommand implements Runnable {
 
     @Override
     public void run() {
+        if (message == null || message.length == 0) {
+            System.out.println("Please provide a message to chat.");
+            // show help
+            CommandLine.usage(this, System.out);
+            return;
+        }
         chat(message);
     }
 
