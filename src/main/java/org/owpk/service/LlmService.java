@@ -22,97 +22,95 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Slf4j
 public class LlmService {
-      private final LlmProvider<?> llmProvider;
-      private final DialogRepository dialogRepository;
-      private final RolesManager rolesManager;
+	private final LlmProvider<?> llmProvider;
+	private final DialogRepository dialogRepository;
+	private final RolesManager rolesManager;
 
-      /**
-       * Method for generating text using LLM
-       *
-       * @param prompt text prompt
-       * @param roleId role ID
-       * @return text response
-       */
-      public Flux<String> generate(String prompt, String roleId) {
-            var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
-            return processLlmResponse(
-                        dialogId -> llmProvider.generate(prompt, rolePrompt),
-                        prompt);
-      }
+	/**
+	 * Method for generating text using LLM
+	 *
+	 * @param prompt text prompt
+	 * @param roleId role ID
+	 * @return text response
+	 */
+	public Flux<String> generate(String prompt, String roleId) {
+		var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
+		return llmProvider.generate(prompt, rolePrompt);
+	}
 
-      /**
-       * Method for chatting with LLM
-       *
-       * @param request                  user request
-       * @param chatHistoryContextLength chat history context length
-       * @return text response
-       */
-      public Flux<String> chat(String prompt, String roleId, int chatHistoryContextLength) {
-            var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
-            var systemRequest = ChatRequest.builder()
-                        .message(rolePrompt)
-                        .role(MessageType.SYSTEM)
-                        .build();
-            var chatRequest = ChatRequest.builder()
-                        .message(prompt)
-                        .role(MessageType.USER)
-                        .build();
+	/**
+	 * Method for chatting with LLM
+	 *
+	 * @param request                  user request
+	 * @param chatHistoryContextLength chat history context length
+	 * @return text response
+	 */
+	public Flux<String> chat(String prompt, String roleId, int chatHistoryContextLength) {
+		var rolePrompt = rolesManager.getByRoleId(roleId).getPrompt();
+		var systemRequest = ChatRequest.builder()
+				.message(rolePrompt)
+				.role(MessageType.SYSTEM)
+				.build();
+		var chatRequest = ChatRequest.builder()
+				.message(prompt)
+				.role(MessageType.USER)
+				.build();
 
-            return processLlmResponse(
-                        dialogId -> prepareAndExecuteChatRequest(dialogId, chatHistoryContextLength, systemRequest,
-                                    chatRequest),
-                        prompt);
-      }
+		return processLlmResponse(
+				dialogId -> prepareAndExecuteChatRequest(dialogId, chatHistoryContextLength, systemRequest,
+						chatRequest),
+				prompt);
+	}
 
-      private Flux<String> prepareAndExecuteChatRequest(
-                  String dialogId,
-                  int chatHistoryContextLength,
-                  ChatRequest systemRequest,
-                  ChatRequest chatRequest) {
-            return dialogRepository.getMessages(dialogId)
-                        .takeLast(chatHistoryContextLength)
-                        .map(it -> ChatRequest.builder()
-                                    .message(it.getContent())
-                                    .role(it.getType())
-                                    .build())
-                        .collectList()
-                        .map(messages -> {
-                              List<ChatRequest> orderedMessages = new ArrayList<>();
-                              orderedMessages.add(systemRequest);
-                              orderedMessages.addAll(messages);
-                              orderedMessages.add(chatRequest);
-                              log.info("Final messages sequence: {}", orderedMessages); // добавить эту строку
-                              return orderedMessages;
-                        })
-                        .flatMapMany(messages -> llmProvider.chat(messages));
-      }
+	private Flux<String> prepareAndExecuteChatRequest(
+			String dialogId,
+			int chatHistoryContextLength,
+			ChatRequest systemRequest,
+			ChatRequest chatRequest) {
+		return dialogRepository.getMessages(dialogId)
+				.takeLast(chatHistoryContextLength)
+				.map(it -> ChatRequest.builder()
+						.message(it.getContent())
+						.role(it.getType())
+						.build())
+				.collectList()
+				.map(messages -> {
+					List<ChatRequest> orderedMessages = new ArrayList<>();
+					orderedMessages.add(systemRequest);
+					orderedMessages.addAll(messages);
+					orderedMessages.add(chatRequest);
+					log.info("Final messages sequence: {}", orderedMessages);
+					return orderedMessages;
+				})
+				.flatMapMany(messages -> llmProvider.chat(messages));
+	}
 
-      private Flux<String> processLlmResponse(
-                  Function<String, Flux<String>> responseProvider,
-                  String prompt) {
-            return dialogRepository.createOrGetDefaultDialog()
-                        .flatMapMany(dialogId -> {
-                              Flux<String> responseStream = responseProvider.apply(dialogId).cache();
+	private Flux<String> processLlmResponse(
+			Function<String, Flux<String>> responseProvider,
+			String prompt) {
+		return dialogRepository.createOrGetDefaultDialog()
+				.flatMapMany(dialogId -> {
+					Flux<String> responseStream = responseProvider.apply(dialogId).cache();
 
-                              Mono<Void> saveOperation = responseStream
-                                          .collectList()
-                                          .map(responses -> String.join("", responses))
-                                          .flatMap(fullResponse -> dialogRepository.saveMessages(dialogId,
-                                                      List.of(createMessage(prompt, MessageType.USER),
-                                                                  createMessage(fullResponse, MessageType.ASSISTANT))))
-                                          .then();
+					Mono<Void> saveOperation = responseStream
+							.collectList()
+							.map(responses -> String.join("", responses))
+							.flatMap(fullResponse -> dialogRepository.saveMessages(dialogId,
+									List.of(createMessage(prompt, MessageType.USER),
+											createMessage(fullResponse, MessageType.ASSISTANT))))
+							.then();
 
-                              return responseStream
-                                          .doOnComplete(() -> saveOperation.subscribe());
-                        });
-      }
+					return responseStream
+							.doOnComplete(() -> saveOperation.subscribe());
+				});
+	}
 
-      private Message createMessage(String content, MessageType type) {
-            return Message.builder()
-                        .content(content)
-                        .type(type)
-                        .timestamp(LocalDateTime.now().toString())
-                        .build();
-      }
+	private Message createMessage(String content, MessageType type) {
+		return Message.builder()
+				.content(content)
+				.type(type)
+				.timestamp(LocalDateTime.now().toString())
+				.build();
+	}
 
 }

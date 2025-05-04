@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.owpk.config.properties.model.ApplicationProperties;
+import org.owpk.service.exception.JllamaException;
 import org.owpk.utils.serializers.Serializer;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class RolesManager {
 
 	public Role getByRoleId(String roleId) {
 		return Optional.ofNullable(applicationProperties.get(roleId))
-				.orElseThrow(() -> new RuntimeException());
+				.orElseThrow(() -> new JllamaException("Role with ID " + roleId + " not found"));
 	}
 
 	public Role parseRole(String yaml) {
