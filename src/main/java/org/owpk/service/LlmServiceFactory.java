@@ -39,7 +39,7 @@ public class LlmServiceFactory {
 		var apiKeyProvider = getApiKeyProvider(properties);
 		if (llm == LlmSupports.KnownLlm.OLLAMA) {
 			var ollamaClient = new OllamaClientLowLevelImpl(streamingHttpClient, properties.getUrl());
-			return new OllamaProvider(ollamaClient, properties, apiKeyProvider);
+			return new OllamaProvider(ollamaClient, properties);
 		}
 		throw new IllegalArgumentException("Unsupported LLM provider: " + llm);
 	}

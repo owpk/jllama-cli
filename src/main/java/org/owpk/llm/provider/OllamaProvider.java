@@ -9,6 +9,7 @@ import org.owpk.llm.client.ollama.client.model.OllamaChatMessage;
 import org.owpk.llm.client.ollama.client.model.OllamaChatRequest;
 import org.owpk.llm.client.ollama.client.model.OllamaGenerateRequest;
 import org.owpk.llm.provider.auth.ApiKeyProvider;
+import org.owpk.llm.provider.auth.NoOpApiKeyProvider;
 import org.owpk.llm.provider.mcp.McpMessage;
 import org.owpk.llm.provider.model.ChatRequest;
 
@@ -19,8 +20,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class OllamaProvider extends LlmProvider<OllamaClient> {
 
-	public OllamaProvider(OllamaClient ollamaClient, LlmProviderProperties properties, ApiKeyProvider apiKeyProvider) {
-		super(ollamaClient, properties, apiKeyProvider);
+	public OllamaProvider(OllamaClient ollamaClient, LlmProviderProperties properties) {
+		super(ollamaClient, properties, new NoOpApiKeyProvider());
 	}
 
 	@Override
