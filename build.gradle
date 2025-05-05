@@ -22,6 +22,10 @@ dependencies {
     // implementation 'io.vavr:vavr:0.10.6'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'ch.qos.logback:logback-classic'
+
+    testImplementation 'io.micronaut:micronaut-http-client'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'io.projectreactor:reactor-test:3.5.0'
 }
 
 def buildTimeAndDate = new Date()
