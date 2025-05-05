@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.owpk.config.properties.model.LlmProviderProperties;
+import org.owpk.llm.provider.auth.ApiKeyProvider;
 import org.owpk.llm.provider.mcp.McpMessage;
 import org.owpk.llm.provider.model.ChatRequest;
 
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 public abstract class LlmProvider<T> {
 	private final T apiClient;
 	protected final LlmProviderProperties properties;
+	protected final ApiKeyProvider apiKeyProvider;
 
 	public void updateClient(T newClient, LlmProviderProperties newProperties) {
 		// Implement client switching logic

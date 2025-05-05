@@ -6,6 +6,8 @@ import org.owpk.config.properties.model.LlmProviderProperties;
 import org.owpk.llm.client.ollama.client.OllamaClientLowLevelImpl;
 import org.owpk.llm.provider.LlmProvider;
 import org.owpk.llm.provider.OllamaProvider;
+import org.owpk.llm.provider.auth.ApiKeyProvider;
+import org.owpk.llm.provider.auth.DefaultApiKeyProvider;
 import org.owpk.service.dialog.DialogRepository;
 import org.owpk.service.role.RolesManager;
 
@@ -34,10 +36,15 @@ public class LlmServiceFactory {
 	}
 
 	private LlmProvider<?> createProvider(LlmSupports.KnownLlm llm, LlmProviderProperties properties) {
+		var apiKeyProvider = getApiKeyProvider(properties);
 		if (llm == LlmSupports.KnownLlm.OLLAMA) {
 			var ollamaClient = new OllamaClientLowLevelImpl(streamingHttpClient, properties.getUrl());
 			return new OllamaProvider(ollamaClient, properties);
 		}
 		throw new IllegalArgumentException("Unsupported LLM provider: " + llm);
+	}
+
+	private ApiKeyProvider getApiKeyProvider(LlmProviderProperties properties) {
+		return new DefaultApiKeyProvider(properties.getApiKey());
 	}
 }
