@@ -3,12 +3,11 @@ package org.owpk.config;
 import java.io.IOException;
 import java.util.Properties;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import picocli.CommandLine.IVersionProvider;
 
 @Slf4j
-@Getter
-public class VersionManager {
+public class VersionManager implements IVersionProvider {
 	private final String version;
 	private final String buildTime;
 	private final String gitCommit;
@@ -37,5 +36,10 @@ public class VersionManager {
 			return String.format("Version: %s (Build: %s, Commit: %s)",
 					version, buildTime, gitCommit);
 		}
+	}
+
+	@Override
+	public String[] getVersion() throws Exception {
+		return new String[] { getVersionInfo().toString() };
 	}
 }
