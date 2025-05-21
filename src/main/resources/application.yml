@@ -13,4 +13,4 @@ micronaut:
         - application/x-ndjson
   http:
     client:
-      read-timeout: 30s
+      read-timeout: 300s
