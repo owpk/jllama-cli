@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.owpk.config.properties.model.LlmProviderProperties;
 import org.owpk.llm.client.ollama.client.OllamaClient;
-import org.owpk.llm.client.ollama.client.model.OllamaChatMessage;
-import org.owpk.llm.client.ollama.client.model.OllamaChatRequest;
-import org.owpk.llm.client.ollama.client.model.OllamaGenerateRequest;
+import org.owpk.llm.client.ollama.model.OllamaChatMessage;
+import org.owpk.llm.client.ollama.model.OllamaChatRequest;
+import org.owpk.llm.client.ollama.model.OllamaGenerateRequest;
 import org.owpk.llm.provider.auth.ApiKeyProvider;
 import org.owpk.llm.provider.auth.NoOpApiKeyProvider;
 import org.owpk.llm.provider.mcp.McpMessage;

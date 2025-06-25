@@ -1,4 +1,4 @@
-package org.owpk.llm.client.ollama.client.model;
+package org.owpk.llm.client.ollama.model;
 
 import java.util.Objects;
 
