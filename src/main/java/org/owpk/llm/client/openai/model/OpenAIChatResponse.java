@@ -1,9 +1,14 @@
 package org.owpk.llm.client.openai.model;
 
-import lombok.Data;
 import java.util.List;
 
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.ReflectiveAccess;
+import lombok.Data;
+
 @Data
+@Introspected
+@ReflectiveAccess
 public class OpenAIChatResponse {
     private List<Choice> choices;
     private String id;
@@ -13,6 +18,8 @@ public class OpenAIChatResponse {
     private Usage usage;
 
     @Data
+    @Introspected
+    @ReflectiveAccess
     public static class Choice {
         private int index;
         private Delta delta;
@@ -20,12 +27,16 @@ public class OpenAIChatResponse {
     }
 
     @Data
+    @Introspected
+    @ReflectiveAccess
     public static class Delta {
         private String content;
         private String role;
     }
 
     @Data
+    @Introspected
+    @ReflectiveAccess
     public static class Usage {
         private int promptTokens;
         private int completionTokens;
