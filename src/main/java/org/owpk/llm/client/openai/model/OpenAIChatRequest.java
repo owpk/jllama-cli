@@ -12,10 +12,3 @@ public class OpenAIChatRequest {
     private boolean stream;
     private Double temperature;
 }
-
-@Data
-@Builder
-class OpenAIChatMessage {
-    private String role;
-    private String content;
-}

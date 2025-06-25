@@ -1,12 +1,12 @@
 package org.owpk.llm.client.ollama.client;
 
 import org.owpk.llm.client.ClientException;
-import org.owpk.llm.client.ollama.client.model.OllamaChatRequest;
-import org.owpk.llm.client.ollama.client.model.OllamaChatResponse;
-import org.owpk.llm.client.ollama.client.model.OllamaEmbeddingRequest;
-import org.owpk.llm.client.ollama.client.model.OllamaEmbeddingResponse;
-import org.owpk.llm.client.ollama.client.model.OllamaGenerateRequest;
-import org.owpk.llm.client.ollama.client.model.OllamaGenerateResponse;
+import org.owpk.llm.client.ollama.model.OllamaChatRequest;
+import org.owpk.llm.client.ollama.model.OllamaChatResponse;
+import org.owpk.llm.client.ollama.model.OllamaEmbeddingRequest;
+import org.owpk.llm.client.ollama.model.OllamaEmbeddingResponse;
+import org.owpk.llm.client.ollama.model.OllamaGenerateRequest;
+import org.owpk.llm.client.ollama.model.OllamaGenerateResponse;
 
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MediaType;
