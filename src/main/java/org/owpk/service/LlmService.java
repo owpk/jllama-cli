@@ -82,7 +82,7 @@ public class LlmService {
 					log.info("Final messages sequence: {}", orderedMessages);
 					return orderedMessages;
 				})
-				.flatMapMany(messages -> llmProvider.chat(messages));
+				.flatMapMany(llmProvider::chat);
 	}
 
 	private Flux<String> processLlmResponse(
@@ -101,7 +101,7 @@ public class LlmService {
 							.then();
 
 					return responseStream
-							.doOnComplete(() -> saveOperation.subscribe());
+							.doOnComplete(saveOperation::subscribe);
 				});
 	}
 

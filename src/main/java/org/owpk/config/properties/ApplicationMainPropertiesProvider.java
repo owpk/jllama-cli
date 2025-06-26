@@ -26,7 +26,7 @@ public class ApplicationMainPropertiesProvider implements ObjectPropsProvider<Ap
 		return new ApplicationProperties(
 				getSupportedLlmProviders().toArray(LlmProviderProperties[]::new),
 				DefaultRoles.getDefaultRoles().stream().map(this::toRoleProps).toArray(RoleProps[]::new),
-				LlmSupports.KnownLlm.OLLAMA.getName(),
+				LlmSupports.KnownProvider.OLLAMA.getName(),
 				DefaultRoles.getDEFAULT().getId(), "", "");
 	}
 

@@ -13,25 +13,26 @@ import lombok.Getter;
  */
 public final class LlmSupports {
 
-	public static final List<KnownLlm> SUPPORTED_PROVIDERS = List.of(
-			KnownLlm.OLLAMA);
+	public static final List<KnownProvider> SUPPORTED_PROVIDERS = List.of(
+			KnownProvider.OLLAMA);
 
 	@Getter
-	public enum KnownLlm {
+	public enum KnownProvider {
 		OLLAMA("ollama", "http://localhost:11434"),
 		OPENAI("openai", "https://api.openai.com"),
+		OPENROUTER("openrouter", "https://openrouter.ai"),
 		MISTRAL("mistral", "https://api.mistral.ai");
 
 		private final String name;
 		private final String defaultUrl;
 
-		KnownLlm(String name, String defaultUrl) {
+		KnownProvider(String name, String defaultUrl) {
 			this.name = name;
 			this.defaultUrl = defaultUrl;
 		}
 
-		public static KnownLlm of(String name) {
-			return Arrays.stream(KnownLlm.values())
+		public static KnownProvider of(String name) {
+			return Arrays.stream(KnownProvider.values())
 					.collect(Collectors.toMap(it -> it.getName(), Function.identity()))
 					.getOrDefault(name, OLLAMA);
 		}

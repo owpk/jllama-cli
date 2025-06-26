@@ -47,7 +47,7 @@ public class LlmCommand implements Runnable {
 
     @Option(names = { "-p", "--provider" }, description = "LLM provider identifier (e.g. ollama)")
     public void provider(String provider) {
-        LlmSupports.KnownLlm.of(provider);
+        LlmSupports.KnownProvider.of(provider);
         propertiesManager.getApplicationProperties().setDefaulProvider(provider);
     }
 

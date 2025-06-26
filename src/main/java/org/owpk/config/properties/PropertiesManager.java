@@ -62,16 +62,16 @@ public class PropertiesManager {
         log.info("Destroying PropertiesManager");
     }
 
-    public LlmProviderProperties getLlmProviderProperties(LlmSupports.KnownLlm llm) {
+    public LlmProviderProperties getLlmProviderProperties(LlmSupports.KnownProvider llm) {
         return Arrays.stream(this.applicationProperties.getLlmProviders())
-                .collect(Collectors.toMap(it -> LlmSupports.KnownLlm.of(it.getProvider()), Function.identity()))
+                .collect(Collectors.toMap(it -> LlmSupports.KnownProvider.of(it.getProvider()), Function.identity()))
                 .get(llm);
     }
 
     public LlmProviderProperties getDefaultLlmProperties() {
         return Arrays.stream(this.applicationProperties.getLlmProviders())
-                .collect(Collectors.toMap(it -> LlmSupports.KnownLlm.of(it.getProvider()), Function.identity()))
-                .get(LlmSupports.KnownLlm.of(this.applicationProperties.getDefaulProvider()));
+                .collect(Collectors.toMap(it -> LlmSupports.KnownProvider.of(it.getProvider()), Function.identity()))
+                .get(LlmSupports.KnownProvider.of(this.applicationProperties.getDefaulProvider()));
     }
 
 }
