@@ -19,6 +19,7 @@ dependencies {
     implementation 'io.micronaut.reactor:micronaut-reactor-http-client'
     implementation 'io.micronaut:micronaut-jackson-databind'
     implementation 'io.micronaut.serde:micronaut-serde-jackson'
+    implementation "io.micronaut.serde:micronaut-serde-api"
     // implementation 'io.vavr:vavr:0.10.6'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'ch.qos.logback:logback-classic'

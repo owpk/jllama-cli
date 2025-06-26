@@ -2,6 +2,7 @@ package org.owpk.config;
 
 import java.util.Optional;
 
+import io.micronaut.json.JsonMapper;
 import org.owpk.config.properties.PropertiesManager;
 import org.owpk.service.LlmServiceFactory;
 import org.owpk.service.dialog.YamlDialogRepositoryImpl;
@@ -13,6 +14,7 @@ import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.http.client.StreamingHttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.sse.SseClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Factory
@@ -54,9 +56,12 @@ public class BeanConfig {
 	}
 
 	@Bean
-	public LlmServiceFactory llmServiceFactory(@Client StreamingHttpClient httpClient,
-			PropertiesManager propertiesManager,
-			YamlDialogRepositoryImpl dialogRepository, RolesManager rolesManager) {
-		return new LlmServiceFactory(httpClient, propertiesManager, dialogRepository, rolesManager);
+	public LlmServiceFactory llmServiceFactory(JsonMapper jsonMapper,
+												@Client StreamingHttpClient httpClient,
+											   PropertiesManager propertiesManager,
+											   YamlDialogRepositoryImpl dialogRepository,
+											   RolesManager rolesManager) {
+		return new LlmServiceFactory(httpClient, jsonMapper, propertiesManager, dialogRepository,
+				rolesManager);
 	}
 }

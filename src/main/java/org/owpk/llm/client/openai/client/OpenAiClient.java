@@ -15,5 +15,5 @@ public interface OpenAiClient {
      * @param request запрос на чат-взаимодействие
      * @return Flux с потоком ответов
      */
-    Flux<OpenAIChatResponse> chat(@Body OpenAIChatRequest request);
+    Flux<String> chat(@Body OpenAIChatRequest request);
 }

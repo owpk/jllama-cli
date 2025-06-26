@@ -1,5 +1,6 @@
 package org.owpk.service;
 
+import io.micronaut.json.JsonMapper;
 import org.owpk.config.LlmSupports;
 import org.owpk.config.properties.PropertiesManager;
 import org.owpk.config.properties.model.LlmProviderProperties;
@@ -15,11 +16,13 @@ import org.owpk.service.role.RolesManager;
 
 import io.micronaut.http.client.StreamingHttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.sse.SseClient;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class LlmServiceFactory {
 	private final @Client StreamingHttpClient streamingHttpClient;
+	private final JsonMapper jsonMapper;
 	private final PropertiesManager propertiesManager;
 	private final DialogRepository dialogRepository;
 	private final RolesManager rolesManager;
@@ -43,7 +46,8 @@ public class LlmServiceFactory {
 			var ollamaClient = new OllamaClientLowLevelImpl(streamingHttpClient, properties.getUrl());
 			return new OllamaProvider(ollamaClient, properties);
 		} else if (llm == LlmSupports.KnownLlm.OPENAI) {
-			var openAiClient = new OpenAiClientImpl(streamingHttpClient, properties.getUrl(), properties.getApiKey());
+			var openAiClient = new OpenAiClientImpl(streamingHttpClient, jsonMapper, properties.getUrl(),
+					properties.getApiKey());
 			return new OpenAiProvider(openAiClient, properties, apiKeyProvider);
 		}
 		throw new IllegalArgumentException("Unsupported LLM provider: " + llm);

@@ -11,6 +11,7 @@ micronaut:
     json:
       additional-types:
         - application/x-ndjson
+        - text/event-stream
   http:
     client:
       read-timeout: 300s

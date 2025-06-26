@@ -43,8 +43,7 @@ public class OpenAiProvider extends LlmProvider<OpenAiClient> {
                         .build()).toList())
                 .stream(true)
                 .build();
-        return getApiClient().chat(req)
-                .map(resp -> resp.getChoices().get(0).getDelta().getContent());
+        return getApiClient().chat(req);
     }
 
     @Override

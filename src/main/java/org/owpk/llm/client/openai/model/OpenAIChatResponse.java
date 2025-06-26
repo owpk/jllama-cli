@@ -4,11 +4,13 @@ import java.util.List;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.ReflectiveAccess;
+import io.micronaut.serde.annotation.SerdeImport;
 import lombok.Data;
 
 @Data
 @Introspected
 @ReflectiveAccess
+@SerdeImport(OpenAIChatResponse.class)
 public class OpenAIChatResponse {
     private List<Choice> choices;
     private String id;
@@ -20,6 +22,7 @@ public class OpenAIChatResponse {
     @Data
     @Introspected
     @ReflectiveAccess
+    @SerdeImport(Choice.class)
     public static class Choice {
         private int index;
         private Delta delta;
@@ -29,6 +32,7 @@ public class OpenAIChatResponse {
     @Data
     @Introspected
     @ReflectiveAccess
+    @SerdeImport(Delta.class)
     public static class Delta {
         private String content;
         private String role;
@@ -37,6 +41,7 @@ public class OpenAIChatResponse {
     @Data
     @Introspected
     @ReflectiveAccess
+    @SerdeImport(Usage.class)
     public static class Usage {
         private int promptTokens;
         private int completionTokens;
