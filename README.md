@@ -11,45 +11,43 @@ A command-line interface for Ollama LLM models, designed for seamless integratio
 - Multiple LLM provider support (currently Ollama)
 
 ## Installation
-### 1. Manual (preferred)
-#### Option 1: Native image executable
 
-> ⚠️ **Important**: GraalVM native image build may have some limitations:
->
-> - Build process might fail on some platforms (especially Windows) due to missing development tools
-> - GraalVM environment variables and paths must be properly configured
-> - Reflection and dynamic class loading may require additional configuration
-> - Build times vary significantly across machines
->
-> Use the latest GraalVM version and ensure all dependencies are installed.
+### Quick Install (Recommended)
 
-> ⚠️ REQUIRES JAVA 21+ GRAAL VM SDK
-- Build native image:
-```sh
+Clone the repository and run the install script:
+
+```bash
+git clone https://github.com/owpk/jllama-cli.git
+cd jllama-cli
+./install.sh
+```
+
+The script will:
+- Check for GraalVM Java 21 and native-image tool
+- Build native image executable
+- Install `jllama` binary to `~/.local/bin`
+
+> **Requirements:** GraalVM Java 21 with native-image support
+
+### Manual Build
+
+#### Option 1: Native Image (faster execution)
+
+```bash
 ./gradlew clean nativeBuild
-```
-- The executable will be created at `${projectRoot}/build/native/nativeCompile/jllama`
-
-- Run with:
-```sh
-./jllama chat "Hello, help me please"
+./build/native/nativeCompile/jllama "Hello"
 ```
 
-#### Option 2: Plain JAR file (slower but more stable):
-> ⚠️ REQUIRES JAVA 21+
-- Build project:
-```sh
+#### Option 2: JAR File (slower but more compatible)
+
+```bash
 ./gradlew clean build
-```
-- The JAR file will be at `${projectRoot}/build/libs/jllama-cli-*-all.jar`
-
-- Run with:
-```sh
-java -jar jllama-cli-*-all.jar chat "Hello, help me please"
+java -jar build/libs/jllama-cli-*-all.jar "Hello"
 ```
 
-### 2. Download releases
-- Native executable or JAR file (platform testing in progress)
+### Download Releases
+
+Pre-built binaries available in [Releases](../../releases).
 
 ## Setup and Configuration
 
