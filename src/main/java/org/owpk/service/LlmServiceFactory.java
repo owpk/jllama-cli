@@ -45,7 +45,7 @@ public class LlmServiceFactory {
 			case OLLAMA -> ollama(properties);
 			case OPENROUTER -> openRouter(properties, apiKeyProvider);
 			default ->
-					throw new IllegalArgumentException("Unsupported LLM provider: " + llm);
+				throw new IllegalArgumentException("Unsupported LLM provider: " + llm);
 		};
 	}
 
@@ -54,7 +54,7 @@ public class LlmServiceFactory {
 		return new OllamaProvider(ollamaClient, properties);
 	}
 
-	private  LlmProvider<?> openRouter(LlmProviderProperties properties, ApiKeyProvider apiKeyProvider) {
+	private LlmProvider<?> openRouter(LlmProviderProperties properties, ApiKeyProvider apiKeyProvider) {
 		var openAiClient = new OpenRouterClientImpl(streamingHttpClient, jsonMapper, properties.getUrl(),
 				properties.getApiKey());
 		return new OpenAiProvider(openAiClient, properties, apiKeyProvider);
